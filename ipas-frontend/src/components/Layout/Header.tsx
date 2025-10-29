@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCases } from '../../contexts/CaseContext';
+import { BASE_URL } from '../../config';
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth();
@@ -53,7 +54,7 @@ const Header: React.FC = () => {
     <AppBar position="fixed" sx={{ backgroundColor: '#1976d2', zIndex: 1200 }}>
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, fontWeight: 'bold' }}>
-          <img src="/assets/images/nttdata-white-logo.svg" alt="nttdata-white-logo" style={{marginRight: '1rem', height:"38px"}} />Smart Auth - Intelligent Prior Authorization System
+          <img src={`${BASE_URL}/assets/images/nttdata-white-logo.svg`} alt="nttdata-white-logo" style={{marginRight: '1rem', height:"38px"}} />Smart Auth - Intelligent Prior Authorization System
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>

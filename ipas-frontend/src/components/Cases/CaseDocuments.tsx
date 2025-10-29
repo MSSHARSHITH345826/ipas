@@ -32,12 +32,13 @@ import {
   Compare as CompareIcon
 } from '@mui/icons-material';
 import DocumentComparisonViewer from './DocumentComparisonViewer';
+import { BASE_URL } from '../../config';
 
 interface CaseDocument {
   id: string;
   name: string;
   type: 'pdf' | 'image' | 'doc' | 'other';
-  category: 'polysomnography-report'| 'imaging'| 'lab-results'|'prior-auth' |'operativenotes' |'radionotes'| 'medical-records' |  'insurance' | 'clinical-notes' | 'diagnostics' | 'drnotes' | 'dmeform' | '2d-doppler' | 'ecg' | 'discharge-summary';
+  category: 'polysomnography-report' | 'imaging' | 'lab-results' | 'prior-auth' | 'operativenotes' | 'radionotes' | 'medical-records' | 'insurance' | 'clinical-notes' | 'diagnostics' | 'drnotes' | 'dmeform' | '2d-doppler' | 'ecg' | 'discharge-summary';
   size: string;
   uploadDate: string;
   status: 'uploaded' | 'processing' | 'ready' | 'error';
@@ -746,7 +747,7 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
           jsonUrl: '/sample-documents/cases/case-007/image.json',
           isExtracted: false
         }
-  
+
       ],
       'PA-2024-008': [
         {
@@ -847,25 +848,25 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
     const loadState = () => {
       const storageKey = `ipas_extractions_${caseId}`;
       const savedState = localStorage.getItem(storageKey);
-      
+
       console.log('Component mounted, checking localStorage:', { storageKey, savedState });
-      
+
       // Also check for alternative key formats
       const altKey1 = `ipas_extractions_${caseId.replace('PA-', '').replace('-', '')}`;
       const altKey2 = `ipas_extractions_${caseId.replace('PA-', '')}`;
       const altState1 = localStorage.getItem(altKey1);
       const altState2 = localStorage.getItem(altKey2);
-      
+
       console.log('Alternative keys checked:', { altKey1, altKey2, altState1, altState2 });
-      
+
       // Check all localStorage keys that start with 'ipas_extractions_'
       const allKeys = Object.keys(localStorage).filter(key => key.startsWith('ipas_extractions_'));
       console.log('All ipas_extractions keys in localStorage:', allKeys);
-      
+
       // Try to load from the main key first
       let stateToLoad = savedState;
       let keyUsed = storageKey;
-      
+
       // If main key is empty, try alternative keys
       if (!stateToLoad || stateToLoad === '{"extractedDocuments":[],"extractionTimestamps":{}}') {
         if (altState1 && altState1 !== '{"extractedDocuments":[],"extractionTimestamps":{}}') {
@@ -878,22 +879,22 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
           console.log('Using alternative key 2:', altKey2);
         }
       }
-      
+
       if (stateToLoad && stateToLoad !== '{"extractedDocuments":[],"extractionTimestamps":{}}') {
         try {
           const parsedState = JSON.parse(stateToLoad);
           const extractedDocs = new Set<string>(parsedState.extractedDocuments || []);
           const timestamps = parsedState.extractionTimestamps || {};
-          
-          console.log('Loading extraction state from key:', keyUsed, { 
-            extractedDocs: Array.from(extractedDocs), 
+
+          console.log('Loading extraction state from key:', keyUsed, {
+            extractedDocs: Array.from(extractedDocs),
             timestamps,
-            extractedCount: extractedDocs.size 
+            extractedCount: extractedDocs.size
           });
-          
+
           setExtractedDocuments(extractedDocs);
           setExtractionTimestamps(timestamps);
-          
+
           // Force a re-render to ensure state is properly displayed
           setForceUpdate(prev => prev + 1);
         } catch (error) {
@@ -902,7 +903,7 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
       } else {
         console.log('No valid saved state found for case:', caseId);
       }
-      
+
       setIsStateLoaded(true);
     };
 
@@ -963,19 +964,19 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
       });
       setExtractionProgress(prev => ({ ...prev, [documentId]: 100 }));
       setExtractedDocuments(prev => new Set(prev).add(documentId));
-      setExtractionTimestamps(prev => ({ 
-        ...prev, 
-        [documentId]: new Date().toISOString() 
+      setExtractionTimestamps(prev => ({
+        ...prev,
+        [documentId]: new Date().toISOString()
       }));
     }, 3000);
   };
 
   const handleExtractAll = async () => {
     setIsExtractingAll(true);
-    
+
     // Get all documents that haven't been extracted yet
     const documentsToExtract = documents.filter(doc => !extractedDocuments.has(doc.id));
-    
+
     // Start extraction for all documents in parallel with staggered completion
     const extractionPromises = documentsToExtract.map((doc, index) => {
       return new Promise<void>((resolve) => {
@@ -983,12 +984,12 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
         const baseDelay = index * 200; // 200ms between each start
         const randomDelay = Math.random() * 1500 + 500; // 500-2000ms processing time
         const totalDelay = baseDelay + randomDelay;
-        
+
         setTimeout(() => {
           setExtractedDocuments(prev => new Set(prev).add(doc.id));
-          setExtractionTimestamps(prev => ({ 
-            ...prev, 
-            [doc.id]: new Date().toISOString() 
+          setExtractionTimestamps(prev => ({
+            ...prev,
+            [doc.id]: new Date().toISOString()
           }));
           resolve();
         }, totalDelay);
@@ -997,9 +998,9 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
 
     // Wait for all extractions to complete
     await Promise.all(extractionPromises);
-    
+
     setIsExtractingAll(false);
-    
+
     // Show completion message
     setShowCompletionMessage(true);
     setTimeout(() => {
@@ -1105,7 +1106,7 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
       return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
@@ -1188,7 +1189,7 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
             All documents related to this prior authorization case. Click to view or download.
           </Typography>
         </Box>
-        
+
         {/* Extract All Button */}
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
           <Box sx={{ display: 'flex', gap: 1 }}>
@@ -1209,7 +1210,7 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
             >
               {isExtractingAll ? 'Extracting All...' : `Extract All (${remainingCount} remaining)`}
             </Button>
-            
+
             {extractedCount > 0 && (
               <Button
                 variant="outlined"
@@ -1233,28 +1234,28 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
               </Button>
             )}
           </Box>
-          
+
           {/* Progress indicator */}
           {isExtractingAll && (
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <LinearProgress 
-                sx={{ 
-                  width: 150, 
-                  height: 6, 
+              <LinearProgress
+                sx={{
+                  width: 150,
+                  height: 6,
                   borderRadius: 3,
                   backgroundColor: '#e0e0e0',
                   '& .MuiLinearProgress-bar': {
                     borderRadius: 3,
                     background: 'linear-gradient(45deg, #4CAF50 30%, #45a049 90%)'
                   }
-                }} 
+                }}
               />
               <Typography variant="caption" color="text.secondary">
                 Processing...
               </Typography>
             </Box>
           )}
-          
+
           {/* Extraction summary */}
           {extractedCount > 0 && (
             <Box sx={{ textAlign: 'right' }}>
@@ -1268,13 +1269,13 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
               )}
             </Box>
           )}
-          
+
           {/* Completion message */}
           {showCompletionMessage && (
-            <Typography 
-              variant="caption" 
-              color="success.main" 
-              sx={{ 
+            <Typography
+              variant="caption"
+              color="success.main"
+              sx={{
                 fontWeight: 'bold',
                 animation: 'pulse 1s ease-in-out',
                 '@keyframes pulse': {
@@ -1298,325 +1299,325 @@ const CaseDocuments: React.FC<CaseDocumentsProps> = ({ caseId }) => {
               <Typography variant="h6" sx={{ ml: 1, fontWeight: 'bold' }}>
                 {getCategoryName(category)}
               </Typography>
-              <Chip 
-                label={`${docs.length} document${docs.length > 1 ? 's' : ''}`} 
-                size="small" 
-                color="primary" 
+              <Chip
+                label={`${docs.length} document${docs.length > 1 ? 's' : ''}`}
+                size="small"
+                color="primary"
                 sx={{ ml: 2 }}
               />
             </Box>
-            
+
             <List>
               {docs.map((doc, index) => {
                 const isExtracted = extractedDocuments.has(doc.id);
                 console.log(`Processing doc ${doc.id} (${doc.name}): isExtracted=${isExtracted}`);
-                
+
                 if (isExtracted) {
                   console.log(`Rendering extracted documents for ${doc.name} (${doc.id})`);
                 }
-                
+
                 return (
-                <React.Fragment key={doc.id}>
-                  {/* Original Document */}
-                  <ListItem
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: '#f5f5f5',
-                        borderRadius: 1
-                      },
-                      backgroundColor: isExtractingAll && !isExtracted 
-                        ? '#fff3e0' 
-                        : 'transparent',
-                      borderLeft: isExtractingAll && !isExtracted
-                        ? '4px solid #FF9800'
-                        : 'none'
-                    }}
-                  >
-                    <ListItemIcon>
-                      {getDocumentIcon(doc.type)}
-                    </ListItemIcon>
-                    
-                    <ListItemText
-                      primary={
-                        <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-                          {doc.name} (Original)
-                        </Typography>
-                      }
-                      secondary={
-                        <Box>
-                          <Typography variant="body2" color="text.secondary">
-                            Size: {doc.size} • Uploaded: {doc.uploadDate}
+                  <React.Fragment key={doc.id}>
+                    {/* Original Document */}
+                    <ListItem
+                      sx={{
+                        '&:hover': {
+                          backgroundColor: '#f5f5f5',
+                          borderRadius: 1
+                        },
+                        backgroundColor: isExtractingAll && !isExtracted
+                          ? '#fff3e0'
+                          : 'transparent',
+                        borderLeft: isExtractingAll && !isExtracted
+                          ? '4px solid #FF9800'
+                          : 'none'
+                      }}
+                    >
+                      <ListItemIcon>
+                        {getDocumentIcon(doc.type)}
+                      </ListItemIcon>
+
+                      <ListItemText
+                        primary={
+                          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                            {doc.name} (Original)
                           </Typography>
-                          <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
-                            <Chip
-                              label={doc.status.toUpperCase()}
-                              size="small"
-                              color={getStatusColor(doc.status)}
-                            />
-                            {isExtractingAll && !isExtracted && (
+                        }
+                        secondary={
+                          <Box>
+                            <Typography variant="body2" color="text.secondary">
+                              Size: {doc.size} • Uploaded: {doc.uploadDate}
+                            </Typography>
+                            <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
                               <Chip
-                                label="QUEUED"
+                                label={doc.status.toUpperCase()}
                                 size="small"
-                                color="warning"
-                                sx={{ fontWeight: 'bold' }}
+                                color={getStatusColor(doc.status)}
                               />
-                            )}
+                              {isExtractingAll && !isExtracted && (
+                                <Chip
+                                  label="QUEUED"
+                                  size="small"
+                                  color="warning"
+                                  sx={{ fontWeight: 'bold' }}
+                                />
+                              )}
+                            </Box>
                           </Box>
+                        }
+                      />
+
+                      <ListItemSecondaryAction>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => handleView({ ...doc, url: `${BASE_URL}` + doc.originalUrl || `${BASE_URL}` + doc.url })}
+                            title="View Original Document"
+                          >
+                            <ViewIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            color="info"
+                            onClick={() => handleCompareDocument(doc)}
+                            title="Compare Original with Extracted Text"
+                          >
+                            <CompareIcon />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            color="secondary"
+                            onClick={() => handleDownload({ ...doc, url: `${BASE_URL}` + doc.originalUrl || `${BASE_URL}` + doc.url })}
+                            title="Download Original Document"
+                          >
+                            <DownloadIcon />
+                          </IconButton>
                         </Box>
-                      }
-                    />
-                    
-                    <ListItemSecondaryAction>
+                      </ListItemSecondaryAction>
+                    </ListItem>
+
+                    {/* Extraction Button */}
+                    <ListItem sx={{ justifyContent: 'center', py: 2 }}>
                       <Box sx={{ display: 'flex', gap: 1 }}>
-                        <IconButton
-                          size="small"
-                          color="primary"
-                          onClick={() => handleView({ ...doc, url: doc.originalUrl || doc.url })}
-                          title="View Original Document"
-                        >
-                          <ViewIcon />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          color="info"
-                          onClick={() => handleCompareDocument(doc)}
-                          title="Compare Original with Extracted Text"
-                        >
-                          <CompareIcon />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          color="secondary"
-                          onClick={() => handleDownload({ ...doc, url: doc.originalUrl || doc.url })}
-                          title="Download Original Document"
-                        >
-                          <DownloadIcon />
-                        </IconButton>
-                      </Box>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-
-                  {/* Extraction Button */}
-                  <ListItem sx={{ justifyContent: 'center', py: 2 }}>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button
-                        variant="contained"
-                        startIcon={<ExtractIcon />}
-                        onClick={() => handleExtractDocument(doc.id)}
-                        disabled={extractingDocuments.has(doc.id) || isExtractingAll}
-                        sx={{ 
-                          minWidth: 200,
-                          background: isExtracted 
-                            ? 'linear-gradient(45deg, #4CAF50 30%, #45a049 90%)'
-                            : 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
-                          '&:hover': {
-                            background: isExtracted
-                              ? 'linear-gradient(45deg, #45a049 30%, #3d8b40 90%)'
-                              : 'linear-gradient(45deg, #1976D2 30%, #1CB5E0 90%)',
-                          },
-                          '&:disabled': {
-                            background: isExtractingAll 
-                              ? 'linear-gradient(45deg, #FF9800 30%, #F57C00 90%)'
-                              : undefined
-                          }
-                        }}
-                      >
-                        {isExtractingAll && !isExtracted ? 'Queued for Extraction...' :
-                         extractingDocuments.has(doc.id) ? 'Extracting...' : 
-                         isExtracted ? 'Re-extract Data' : 'Extract Data'}
-                      </Button>
-                      
-                      {isExtracted && (
                         <Button
-                          variant="outlined"
-                          size="small"
-                          onClick={() => {
-                            setExtractedDocuments(prev => {
-                              const newSet = new Set(prev);
-                              newSet.delete(doc.id);
-                              return newSet;
-                            });
-                            setExtractionTimestamps(prev => {
-                              const newTimestamps = { ...prev };
-                              delete newTimestamps[doc.id];
-                              return newTimestamps;
-                            });
-                          }}
-                          sx={{ 
-                            minWidth: 120,
-                            borderColor: '#f44336',
-                            color: '#f44336',
+                          variant="contained"
+                          startIcon={<ExtractIcon />}
+                          onClick={() => handleExtractDocument(doc.id)}
+                          disabled={extractingDocuments.has(doc.id) || isExtractingAll}
+                          sx={{
+                            minWidth: 200,
+                            background: isExtracted
+                              ? 'linear-gradient(45deg, #4CAF50 30%, #45a049 90%)'
+                              : 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)',
                             '&:hover': {
-                              borderColor: '#d32f2f',
-                              backgroundColor: '#ffebee'
+                              background: isExtracted
+                                ? 'linear-gradient(45deg, #45a049 30%, #3d8b40 90%)'
+                                : 'linear-gradient(45deg, #1976D2 30%, #1CB5E0 90%)',
+                            },
+                            '&:disabled': {
+                              background: isExtractingAll
+                                ? 'linear-gradient(45deg, #FF9800 30%, #F57C00 90%)'
+                                : undefined
                             }
                           }}
                         >
-                          Clear
+                          {isExtractingAll && !isExtracted ? 'Queued for Extraction...' :
+                            extractingDocuments.has(doc.id) ? 'Extracting...' :
+                              isExtracted ? 'Re-extract Data' : 'Extract Data'}
                         </Button>
-                      )}
-                    </Box>
-                  </ListItem>
 
-                  {/* Extraction Progress */}
-                  {extractingDocuments.has(doc.id) && (
-                    <ListItem sx={{ py: 1 }}>
-                      <Box sx={{ width: '100%' }}>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={extractionProgress[doc.id] || 0}
-                          sx={{ 
-                            height: 8, 
-                            borderRadius: 4,
-                            backgroundColor: '#e0e0e0',
-                            '& .MuiLinearProgress-bar': {
-                              borderRadius: 4,
-                              background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)'
-                            }
-                          }}
-                        />
-                        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-                          AI is extracting structured data from the document... {extractionProgress[doc.id] || 0}%
-                        </Typography>
+                        {isExtracted && (
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={() => {
+                              setExtractedDocuments(prev => {
+                                const newSet = new Set(prev);
+                                newSet.delete(doc.id);
+                                return newSet;
+                              });
+                              setExtractionTimestamps(prev => {
+                                const newTimestamps = { ...prev };
+                                delete newTimestamps[doc.id];
+                                return newTimestamps;
+                              });
+                            }}
+                            sx={{
+                              minWidth: 120,
+                              borderColor: '#f44336',
+                              color: '#f44336',
+                              '&:hover': {
+                                borderColor: '#d32f2f',
+                                backgroundColor: '#ffebee'
+                              }
+                            }}
+                          >
+                            Clear
+                          </Button>
+                        )}
                       </Box>
                     </ListItem>
-                  )}
 
-                  {/* Extracted Documents */}
-                  {isExtracted && (
-                    <>
-                      {/* Extracted PDF */}
-                      <ListItem
-                        sx={{
-                          '&:hover': {
-                            backgroundColor: '#f5f5f5',
-                            borderRadius: 1
-                          },
-                          backgroundColor: '#f8f9fa',
-                          borderLeft: '4px solid #4caf50'
-                        }}
-                      >
-                        <ListItemIcon>
-                          <CheckCircleIcon color="success" />
-                        </ListItemIcon>
-                        
-                        <ListItemText
-                          primary={
-                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
-                              {doc.name} (Extracted PDF)
-                            </Typography>
-                          }
-                          secondary={
-                            <Box>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Typography variant="body2" color="text.secondary">
-                                  Size: {doc.size.replace(/\d+/, (match) => Math.floor(parseInt(match) * 0.15).toString())} • 
-                                </Typography>
-                                <TimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                                <Typography variant="body2" color="text.secondary">
-                                  {extractionTimestamps[doc.id] ? formatTimestamp(extractionTimestamps[doc.id]) : 'Just now'}
-                                </Typography>
-                              </Box>
-                              <Chip
-                                label="EXTRACTED"
-                                size="small"
-                                color="success"
-                                sx={{ mt: 0.5 }}
-                              />
-                            </Box>
-                          }
-                        />
-                        
-                        <ListItemSecondaryAction>
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            <IconButton
-                              size="small"
-                              color="primary"
-                              onClick={() => handleView({ ...doc, url: doc.extractedUrl || doc.url })}
-                              title="View Extracted PDF"
-                            >
-                              <ViewIcon />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              color="secondary"
-                              onClick={() => handleDownload({ ...doc, url: doc.extractedUrl || doc.url })}
-                              title="Download Extracted PDF"
-                            >
-                              <DownloadIcon />
-                            </IconButton>
-                          </Box>
-                        </ListItemSecondaryAction>
+                    {/* Extraction Progress */}
+                    {extractingDocuments.has(doc.id) && (
+                      <ListItem sx={{ py: 1 }}>
+                        <Box sx={{ width: '100%' }}>
+                          <LinearProgress
+                            variant="determinate"
+                            value={extractionProgress[doc.id] || 0}
+                            sx={{
+                              height: 8,
+                              borderRadius: 4,
+                              backgroundColor: '#e0e0e0',
+                              '& .MuiLinearProgress-bar': {
+                                borderRadius: 4,
+                                background: 'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)'
+                              }
+                            }}
+                          />
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                            AI is extracting structured data from the document... {extractionProgress[doc.id] || 0}%
+                          </Typography>
+                        </Box>
                       </ListItem>
+                    )}
 
-                      {/* Extracted JSON */}
-                      <ListItem
-                        sx={{
-                          '&:hover': {
-                            backgroundColor: '#f5f5f5',
-                            borderRadius: 1
-                          },
-                          backgroundColor: '#f8f9fa',
-                          borderLeft: '4px solid #4caf50'
-                        }}
-                      >
-                        <ListItemIcon>
-                          <JsonIcon color="success" />
-                        </ListItemIcon>
-                        
-                        <ListItemText
-                          primary={
-                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
-                              {doc.name} (Structured Data)
-                            </Typography>
-                          }
-                          secondary={
-                            <Box>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                <Typography variant="body2" color="text.secondary">
-                                  Size: ~15 KB  
-                                </Typography>
-                                <TimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                                <Typography variant="body2" color="text.secondary">
-                                  {extractionTimestamps[doc.id] ? formatTimestamp(extractionTimestamps[doc.id]) : 'Just now'}
-                                </Typography>
+                    {/* Extracted Documents */}
+                    {isExtracted && (
+                      <>
+                        {/* Extracted PDF */}
+                        <ListItem
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: '#f5f5f5',
+                              borderRadius: 1
+                            },
+                            backgroundColor: '#f8f9fa',
+                            borderLeft: '4px solid #4caf50'
+                          }}
+                        >
+                          <ListItemIcon>
+                            <CheckCircleIcon color="success" />
+                          </ListItemIcon>
+
+                          <ListItemText
+                            primary={
+                              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+                                {doc.name} (Extracted PDF)
+                              </Typography>
+                            }
+                            secondary={
+                              <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Size: {doc.size.replace(/\d+/, (match) => Math.floor(parseInt(match) * 0.15).toString())} •
+                                  </Typography>
+                                  <TimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                                  <Typography variant="body2" color="text.secondary">
+                                    {extractionTimestamps[doc.id] ? formatTimestamp(extractionTimestamps[doc.id]) : 'Just now'}
+                                  </Typography>
+                                </Box>
+                                <Chip
+                                  label="EXTRACTED"
+                                  size="small"
+                                  color="success"
+                                  sx={{ mt: 0.5 }}
+                                />
                               </Box>
-                              <Chip
-                                label="STRUCTURED"
+                            }
+                          />
+
+                          <ListItemSecondaryAction>
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                              <IconButton
                                 size="small"
-                                color="success"
-                                sx={{ mt: 0.5 }}
-                              />
+                                color="primary"
+                                onClick={() => handleView({ ...doc, url: `${BASE_URL}` + doc.extractedUrl || `${BASE_URL}` + doc.url })}
+                                title="View Extracted PDF"
+                              >
+                                <ViewIcon />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                color="secondary"
+                                onClick={() => handleDownload({ ...doc, url: `${BASE_URL}` + doc.extractedUrl || `${BASE_URL}` + doc.url })}
+                                title="Download Extracted PDF"
+                              >
+                                <DownloadIcon />
+                              </IconButton>
                             </Box>
-                          }
-                        />
-                        
-                        <ListItemSecondaryAction>
-                          <Box sx={{ display: 'flex', gap: 1 }}>
-                            <IconButton
-                              size="small"
-                              color="primary"
-                              onClick={() => handleView({ ...doc, url: doc.jsonUrl || doc.url })}
-                              title="View JSON Data"
-                            >
-                              <ViewIcon />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              color="secondary"
-                              onClick={() => handleDownload({ ...doc, url: doc.jsonUrl || doc.url })}
-                              title="Download JSON Data"
-                            >
-                              <DownloadIcon />
-                            </IconButton>
-                          </Box>
-                        </ListItemSecondaryAction>
-                      </ListItem>
-                    </>
-                  )}
-                  
-                  {index < docs.length - 1 && <Divider />}
-                </React.Fragment>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+
+                        {/* Extracted JSON */}
+                        <ListItem
+                          sx={{
+                            '&:hover': {
+                              backgroundColor: '#f5f5f5',
+                              borderRadius: 1
+                            },
+                            backgroundColor: '#f8f9fa',
+                            borderLeft: '4px solid #4caf50'
+                          }}
+                        >
+                          <ListItemIcon>
+                            <JsonIcon color="success" />
+                          </ListItemIcon>
+
+                          <ListItemText
+                            primary={
+                              <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: '#2e7d32' }}>
+                                {doc.name} (Structured Data)
+                              </Typography>
+                            }
+                            secondary={
+                              <Box>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                  <Typography variant="body2" color="text.secondary">
+                                    Size: ~15 KB
+                                  </Typography>
+                                  <TimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                                  <Typography variant="body2" color="text.secondary">
+                                    {extractionTimestamps[doc.id] ? formatTimestamp(extractionTimestamps[doc.id]) : 'Just now'}
+                                  </Typography>
+                                </Box>
+                                <Chip
+                                  label="STRUCTURED"
+                                  size="small"
+                                  color="success"
+                                  sx={{ mt: 0.5 }}
+                                />
+                              </Box>
+                            }
+                          />
+
+                          <ListItemSecondaryAction>
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                              <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={() => handleView({ ...doc, url: `${BASE_URL}` + doc.jsonUrl || `${BASE_URL}` + doc.url })}
+                                title="View JSON Data"
+                              >
+                                <ViewIcon />
+                              </IconButton>
+                              <IconButton
+                                size="small"
+                                color="secondary"
+                                onClick={() => handleDownload({ ...doc, url: `${BASE_URL}` + doc.jsonUrl || `${BASE_URL}` + doc.url })}
+                                title="Download JSON Data"
+                              >
+                                <DownloadIcon />
+                              </IconButton>
+                            </Box>
+                          </ListItemSecondaryAction>
+                        </ListItem>
+                      </>
+                    )}
+
+                    {index < docs.length - 1 && <Divider />}
+                  </React.Fragment>
                 );
               })}
             </List>

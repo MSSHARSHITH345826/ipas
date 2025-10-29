@@ -8,6 +8,7 @@ import GeographicHeatMap from '../components/Dashboard/GeographicHeatMap';
 import HospitalPerformance from '../components/Dashboard/HospitalPerformance';
 import CaseDetailsEnhanced from '../components/Cases/CaseDetailsEnhanced';
 import ErrorBoundary from '../components/ErrorBoundary';
+import { BASE_URL } from '../config';
 
 const Dashboard: React.FC = () => {
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
@@ -123,7 +124,7 @@ const Dashboard: React.FC = () => {
                 startIcon={<DownloadIcon />}
                 onClick={() => {
                   const link = document.createElement('a');
-                  link.href = `/sample-documents/approval-letters/${selectedCaseId}-approval-letter.pdf`;
+                  link.href = `${BASE_URL}/sample-documents/approval-letters/${selectedCaseId}-approval-letter.pdf`;
                   link.download = `${selectedCaseId}-approval-letter.pdf`;
                   link.click();
                 }}

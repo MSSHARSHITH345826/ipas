@@ -223,7 +223,7 @@ const App: React.FC = () => {
         <CssBaseline />
         <AuthProvider>
           <CaseProvider>
-            <Router>
+            <Router basename="/SmartAuth">
               <AppRoutes />
             </Router>
           </CaseProvider>
