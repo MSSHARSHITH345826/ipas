@@ -35,7 +35,6 @@ import {
 } from '@mui/icons-material';
 import EMRNotificationStatus from '../Notifications/EMRNotificationStatus';
 import { statusTracker } from '../../services/statusTracker';
-import { BASE_URL } from '../../config';
 
 interface ProcessStep {
   id: string;
@@ -63,7 +62,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
   const [showMessage, setShowMessage] = useState<string>('');
   const [sessionLoaded, setSessionLoaded] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState<Array<{ role: 'user' | 'assistant', content: string }>>([]);
+  const [chatMessages, setChatMessages] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
   const [chatInput, setChatInput] = useState('');
   const [decisionDialogOpen, setDecisionDialogOpen] = useState(false);
   const [selectedDecision, setSelectedDecision] = useState<'approve' | 'partial' | 'decline' | null>(null);
@@ -117,7 +116,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         }
       ];
     }
-
+    
     // Case PA-2024-002: Complex review workflow (non-gold, high amount)
     if (caseId === 'PA-2024-002' || caseId === '002') {
       return [
@@ -233,7 +232,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         }
       ];
     }
-
+    
     // Case PA-2024-003: Partial approval workflow (coverage limit)
     if (caseId === 'PA-2024-003' || caseId === '003') {
       return [
@@ -349,7 +348,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         }
       ];
     }
-
+    
     // Case PA-2024-004: Denial workflow (missing documentation)
     if (caseId === 'PA-2024-004' || caseId === '004') {
       return [
@@ -425,7 +424,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         }
       ];
     }
-
+    
     // Case PA-2024-005: Full approval workflow for CT Chest
     if (caseId === 'PA-2024-005' || caseId === '005') {
       return [
@@ -541,7 +540,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         }
       ];
     }
-
+    
     // Case PA-2024-006: Full review workflow ending in approval (CPAP replacement - compliant patient)
     // Case PA-2024-008: Full review workflow ending in approval (Cardiac Rehabilitation post-NSTEMI)
     if (caseId === 'PA-2024-006' || caseId === '006' || caseId === 'PA-2024-008' || caseId === '008') {
@@ -659,7 +658,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
       ];
     }
 
-    // Case PA-2024-007: Full review workflow ending in denial (Inpatient admission - uncomplicated diverticulitis)
+   // Case PA-2024-007: Full review workflow ending in denial (Inpatient admission - uncomplicated diverticulitis)
     if (caseId === 'PA-2024-007' || caseId === '007') {
       return [
         {
@@ -774,7 +773,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         }
       ];
     }
-
+ 
 
 
     // Default fallback for unknown cases
@@ -833,9 +832,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     const loadSessionState = () => {
       const sessionKey = `ipas_orchestration_${caseId}`;
       const savedSession = localStorage.getItem(sessionKey);
-
+      
       console.log('Loading orchestration session:', { sessionKey, savedSession });
-
+      
       // Force clear old sessions for PA-2024-002 to ensure new layout loads
       if (caseId === 'PA-2024-002' && savedSession) {
         console.log('Clearing old PA-2024-002 session to load new layout');
@@ -843,26 +842,26 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         setSessionLoaded(true);
         return;
       }
-
+      
       if (savedSession) {
         try {
           const parsedSession = JSON.parse(savedSession);
           const savedSteps = parsedSession.processSteps || [];
           const savedAnimationStep = parsedSession.animationStep || 0;
           const savedMessage = parsedSession.showMessage || '';
-
+          
           console.log('Loaded session state:', { savedSteps, savedAnimationStep, savedMessage });
-
+          
           // Validate that saved steps match the current case workflow
           const expectedSteps = getInitialProcessSteps();
-          const hasAllSteps = savedSteps.length === expectedSteps.length &&
-            expectedSteps.every(expected =>
-              savedSteps.some((s: ProcessStep) => s.id === expected.id)
-            );
-
+          const hasAllSteps = savedSteps.length === expectedSteps.length && 
+                             expectedSteps.every(expected => 
+                               savedSteps.some((s: ProcessStep) => s.id === expected.id)
+                             );
+          
           if (hasAllSteps) {
             setProcessSteps(savedSteps);
-
+            
             if (savedAnimationStep > 0) {
               setAnimationStep(savedAnimationStep);
               setShowMessage(savedMessage);
@@ -875,7 +874,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
           console.error('Error loading session state:', error);
         }
       }
-
+      
       setSessionLoaded(true);
     };
 
@@ -885,7 +884,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
   // Save session state to localStorage whenever it changes
   useEffect(() => {
     if (!sessionLoaded) return;
-
+    
     const sessionKey = `ipas_orchestration_${caseId}`;
     const sessionState = {
       processSteps,
@@ -947,9 +946,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     const newX = e.clientX - containerRect.left - dragOffset.x;
     const newY = e.clientY - containerRect.top - dragOffset.y;
 
-    setProcessSteps(prev =>
-      prev.map(step =>
-        step.id === draggedStep
+    setProcessSteps(prev => 
+      prev.map(step => 
+        step.id === draggedStep 
           ? { ...step, position: { x: Math.max(0, newX), y: Math.max(0, newY) } }
           : step
       )
@@ -1062,30 +1061,30 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setTimeout(() => {
       setShowMessage('Start process completed ✓');
       setAnimationStep(3);
-
+      
       // Mark Start as completed
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'start'
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'start' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Automatically proceed to Auth Intake after a short delay
       setTimeout(() => {
         setShowMessage('Proceeding to Auth Intake...');
         setAnimationStep(4);
-
+        
         // Update Auth Intake to running status
-        setProcessSteps(prev =>
-          prev.map(step =>
-            step.id === 'auth-intake'
+        setProcessSteps(prev => 
+          prev.map(step => 
+            step.id === 'auth-intake' 
               ? { ...step, status: 'running' }
               : step
           )
         );
-
+        
         // Start the Auth Intake process
         startAuthIntakeProcess();
       }, 2000);
@@ -1098,9 +1097,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setShowMessage('');
 
     // Update Auth Intake status to running
-    setProcessSteps(prev =>
-      prev.map(step =>
-        step.id === 'auth-intake'
+    setProcessSteps(prev => 
+      prev.map(step => 
+        step.id === 'auth-intake' 
           ? { ...step, status: 'running' }
           : step
       )
@@ -1154,13 +1153,13 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     // Check localStorage for extraction status
     const storageKey = `ipas_extractions_${caseId}`;
     const savedState = localStorage.getItem(storageKey);
-
+    
     if (savedState) {
       try {
         const parsedState = JSON.parse(savedState);
         const extractedDocs = parsedState.extractedDocuments || [];
         const totalDocuments = 5; // Based on our case structure
-
+        
         if (extractedDocs.length === 0) {
           // No documents extracted - start extraction
           setShowMessage('Starting Document Extraction...');
@@ -1170,7 +1169,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
           // Partial extraction - continue
           setShowMessage(`Found ${extractedDocs.length}/${totalDocuments} extracted documents`);
           setAnimationStep(8);
-
+          
           setTimeout(() => {
             setShowMessage('Continuing document retrieval...');
             setAnimationStep(9);
@@ -1202,16 +1201,16 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
       setShowMessage('Extracting data from the document...');
       setAnimationStep(9);
     }, 2000);
-
+    
     setTimeout(() => {
       setShowMessage('Document extraction in progress...');
       setAnimationStep(10);
     }, 4000);
-
+    
     setTimeout(() => {
       setShowMessage('Documents extracted successfully ✓');
       setAnimationStep(11);
-
+      
       // Simulate saving extraction data to localStorage
       const storageKey = `ipas_extractions_${caseId}`;
       const extractionData = {
@@ -1225,52 +1224,52 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         },
         // Add extracted data fields for all cases to ensure success
         extractedData: {
-          email: caseId === 'PA-2024-001' ? 'john.doe@email.com' :
-            caseId === 'PA-2024-002' ? 'mary.johnson@email.com' :
-              caseId === 'PA-2024-003' ? 'robert.davis@email.com' :
-                caseId === 'PA-2024-004' ? 'lisa.wilson@email.com' :
-                  caseId === 'PA-2024-005' ? 'david.brown@email.com' :
-                    caseId === 'PA-2024-006' ? 'rebecca.hardin@email.com' :
-                      caseId === 'PA-2024-008' ? 'daniel.delossantos@email.com' : 'patient@email.com',
+          email: caseId === 'PA-2024-001' ? 'john.doe@email.com' : 
+                 caseId === 'PA-2024-002' ? 'mary.johnson@email.com' :
+                 caseId === 'PA-2024-003' ? 'robert.davis@email.com' :
+                 caseId === 'PA-2024-004' ? 'lisa.wilson@email.com' :
+                 caseId === 'PA-2024-005' ? 'david.brown@email.com' :
+                 caseId === 'PA-2024-006' ? 'rebecca.hardin@email.com' :
+                 caseId === 'PA-2024-008' ? 'daniel.delossantos@email.com' : 'patient@email.com',
           mail: caseId === 'PA-2024-001' ? '123 Main St, Anytown, USA' :
-            caseId === 'PA-2024-002' ? '456 Oak Ave, Springfield, USA' :
-              caseId === 'PA-2024-003' ? '789 Pine Rd, Riverside, USA' :
+                caseId === 'PA-2024-002' ? '456 Oak Ave, Springfield, USA' :
+                caseId === 'PA-2024-003' ? '789 Pine Rd, Riverside, USA' :
                 caseId === 'PA-2024-004' ? '321 Elm St, Lakeside, USA' :
-                  caseId === 'PA-2024-005' ? '654 Maple Dr, Hillside, USA' :
-                    caseId === 'PA-2024-006' ? '987 Cedar Ln, Valley, USA' :
-                      caseId === 'PA-2024-008' ? '123 Trident Way, Charleston, USA' : '123 Patient St',
+                caseId === 'PA-2024-005' ? '654 Maple Dr, Hillside, USA' :
+                caseId === 'PA-2024-006' ? '987 Cedar Ln, Valley, USA' :
+                caseId === 'PA-2024-008' ? '123 Trident Way, Charleston, USA' : '123 Patient St',
           fax: caseId === 'PA-2024-001' ? '+1-555-123-4567' :
-            caseId === 'PA-2024-002' ? '+1-555-234-5678' :
-              caseId === 'PA-2024-003' ? '+1-555-345-6789' :
-                caseId === 'PA-2024-004' ? '+1-555-456-7890' :
-                  caseId === 'PA-2024-005' ? '+1-555-567-8901' :
-                    caseId === 'PA-2024-006' ? '+1-555-678-9012' :
-                      caseId === 'PA-2024-008' ? '+1-555-789-0123' : '+1-555-000-0000',
+               caseId === 'PA-2024-002' ? '+1-555-234-5678' :
+               caseId === 'PA-2024-003' ? '+1-555-345-6789' :
+               caseId === 'PA-2024-004' ? '+1-555-456-7890' :
+               caseId === 'PA-2024-005' ? '+1-555-567-8901' :
+               caseId === 'PA-2024-006' ? '+1-555-678-9012' :
+               caseId === 'PA-2024-008' ? '+1-555-789-0123' : '+1-555-000-0000',
           phone: caseId === 'PA-2024-001' ? '+1-555-987-6543' :
-            caseId === 'PA-2024-002' ? '+1-555-876-5432' :
-              caseId === 'PA-2024-003' ? '+1-555-765-4321' :
-                caseId === 'PA-2024-004' ? '+1-555-654-3210' :
-                  caseId === 'PA-2024-005' ? '+1-555-543-2109' :
-                    caseId === 'PA-2024-006' ? '+1-555-432-1098' :
-                      caseId === 'PA-2024-008' ? '+1-555-321-0987' : '+1-555-000-0000',
+                 caseId === 'PA-2024-002' ? '+1-555-876-5432' :
+                 caseId === 'PA-2024-003' ? '+1-555-765-4321' :
+                 caseId === 'PA-2024-004' ? '+1-555-654-3210' :
+                 caseId === 'PA-2024-005' ? '+1-555-543-2109' :
+                 caseId === 'PA-2024-006' ? '+1-555-432-1098' :
+                 caseId === 'PA-2024-008' ? '+1-555-321-0987' : '+1-555-000-0000',
           edi_fhir: caseId === 'PA-2024-001' ? 'FHIR-R4-Resource' :
-            caseId === 'PA-2024-002' ? 'FHIR-R4-Cardiology' :
-              caseId === 'PA-2024-003' ? 'FHIR-R4-Orthopedic' :
-                caseId === 'PA-2024-004' ? 'FHIR-R4-Gastroenterology' :
-                  caseId === 'PA-2024-005' ? 'FHIR-R4-Radiology' :
+                    caseId === 'PA-2024-002' ? 'FHIR-R4-Cardiology' :
+                    caseId === 'PA-2024-003' ? 'FHIR-R4-Orthopedic' :
+                    caseId === 'PA-2024-004' ? 'FHIR-R4-Gastroenterology' :
+                    caseId === 'PA-2024-005' ? 'FHIR-R4-Radiology' :
                     caseId === 'PA-2024-006' ? 'FHIR-R4-DME-Pulmonology' :
-                      caseId === 'PA-2024-008' ? 'FHIR-R4-Cardiology' : 'FHIR-R4-Resource',
+                    caseId === 'PA-2024-008' ? 'FHIR-R4-Cardiology' : 'FHIR-R4-Resource',
           auth_id: caseId === 'PA-2024-001' ? 'AUTH-2024-001' :
-            caseId === 'PA-2024-002' ? 'AUTH-2024-002' :
-              caseId === 'PA-2024-003' ? 'AUTH-2024-003' :
-                caseId === 'PA-2024-004' ? 'AUTH-2024-004' :
-                  caseId === 'PA-2024-005' ? 'AUTH-2024-005' :
-                    caseId === 'PA-2024-006' ? 'AUTH-2024-006' :
-                      caseId === 'PA-2024-008' ? 'AUTH-2024-008' : 'AUTH-2024-000'
+                   caseId === 'PA-2024-002' ? 'AUTH-2024-002' :
+                   caseId === 'PA-2024-003' ? 'AUTH-2024-003' :
+                   caseId === 'PA-2024-004' ? 'AUTH-2024-004' :
+                   caseId === 'PA-2024-005' ? 'AUTH-2024-005' :
+                   caseId === 'PA-2024-006' ? 'AUTH-2024-006' :
+                   caseId === 'PA-2024-008' ? 'AUTH-2024-008' : 'AUTH-2024-000'
         }
       };
       localStorage.setItem(storageKey, JSON.stringify(extractionData));
-
+      
       showAuthIntakeData();
     }, 6000);
   };
@@ -1295,7 +1294,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         setTimeout(() => {
           // Check if field exists in extracted data
           const isFound = checkFieldInExtractedData(field.field);
-
+          
           if (isFound) {
             foundFields++;
             setShowMessage(`✓ ${field.name} found`);
@@ -1316,37 +1315,37 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
           setShowMessage(`⚠️ Auth Intake partially completed (${foundFields}/${requiredFields.length} fields found) - Proceeding anyway`);
           setAnimationStep(18);
         }
-
+        
         // Update Auth Intake status to completed (even with partial data)
-        setProcessSteps(prev =>
-          prev.map(step =>
-            step.id === 'auth-intake'
+        setProcessSteps(prev => 
+          prev.map(step => 
+            step.id === 'auth-intake' 
               ? { ...step, status: 'completed' }
               : step
           )
         );
-
+        
         // Automatically proceed to Auth Triage after a short delay
         setTimeout(() => {
           setShowMessage('Proceeding to Auth Triage...');
           setAnimationStep(19);
-
+          
           // Update Auth Triage to running status
-          setProcessSteps(prev =>
-            prev.map(step =>
-              step.id === 'auth-triage'
+          setProcessSteps(prev => 
+            prev.map(step => 
+              step.id === 'auth-triage' 
                 ? { ...step, status: 'running' }
                 : step
             )
           );
-
+          
           // Keep animation active for 2 more seconds while transitioning
           setTimeout(() => {
             // Start the Auth Triage process
             startAuthTriageProcess();
           }, 2000);
         }, 2000);
-
+        
         setIsAnimating(false);
       }, (requiredFields.length + 1) * 1000);
     };
@@ -1366,23 +1365,23 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     // Check localStorage for extracted documents
     const storageKey = `ipas_extractions_${caseId}`;
     const savedState = localStorage.getItem(storageKey);
-
+    
     if (!savedState) return false;
-
+    
     try {
       const parsedState = JSON.parse(savedState);
       const extractedData = parsedState.extractedData || {};
-
+      
       // Check if the specific field exists in extracted data
       if (extractedData[fieldName]) {
         return true;
       }
-
+      
       // For Case 001, Case 002, and Case 006, ensure all fields are found for demo purposes
       if (caseId === 'PA-2024-001' || caseId === '001' || caseId === 'PA-2024-002' || caseId === '002' || caseId === 'PA-2024-006' || caseId === '006' || caseId === 'PA-2024-008' || caseId === '008') {
         return true;
       }
-
+      
       // For other cases, use realistic success rates
       const fieldSuccessRates: { [key: string]: number } = {
         'email': 0.9,      // 90% success rate
@@ -1392,7 +1391,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         'edi_fhir': 0.6,   // 60% success rate
         'auth_id': 0.8     // 80% success rate
       };
-
+      
       const successRate = fieldSuccessRates[fieldName] || 0.5;
       return Math.random() < successRate;
     } catch (error) {
@@ -1494,25 +1493,25 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setTimeout(() => {
       setShowMessage('✓ Auth Triage completed');
       setAnimationStep(36);
-
+      
       // Update Auth Triage status to completed
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'auth-triage'
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'auth-triage' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Route to next stage based on case
       setTimeout(() => {
         if (caseId === 'PA-2024-001') {
           // Case-001: Direct to Provider Notification
           setShowMessage('Proceeding to Provider Notification...');
           setAnimationStep(37);
-          setProcessSteps(prev =>
-            prev.map(step =>
-              step.id === 'provider-notification'
+          setProcessSteps(prev => 
+            prev.map(step => 
+              step.id === 'provider-notification' 
                 ? { ...step, status: 'running' }
                 : step
             )
@@ -1524,9 +1523,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
           // Case-002, Case-003, Case-004, Case-005, Case-006 & Case-007: Proceed to Member Verification
           setShowMessage('Proceeding to Member Verification...');
           setAnimationStep(37);
-          setProcessSteps(prev =>
-            prev.map(step =>
-              step.id === 'member-verification'
+          setProcessSteps(prev => 
+            prev.map(step => 
+              step.id === 'member-verification' 
                 ? { ...step, status: 'running' }
                 : step
             )
@@ -1600,7 +1599,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setTimeout(() => {
       setShowMessage('✓ Data transmitted to EMR successfully');
       setAnimationStep(46);
-
+      
       // Trigger EMR notification service immediately
       import('../../services/emrNotificationService').then(({ emrNotificationService }) => {
         // Send to EPIC immediately
@@ -1610,7 +1609,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
           `AUTH-${caseId}`,
           'CPT-12345'
         );
-
+        
         // Simulate hospital notification after 2 seconds
         setTimeout(() => {
           emrNotificationService.simulateHospitalNotification(
@@ -1619,7 +1618,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
             0
           );
         }, 2000);
-
+        
         // Simulate order placement after additional 3 seconds
         setTimeout(() => {
           emrNotificationService.simulateOrderPlacement(
@@ -1643,31 +1642,31 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         setShowMessage('🎉 Authorization Complete - Letter available for download!');
       }
       setAnimationStep(47);
-
+      
       // Update Provider Notification status to completed
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'provider-notification'
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'provider-notification' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Mark letter as generated in localStorage for dashboard notification
       localStorage.setItem(`ipas_letter_generated_${caseId}`, new Date().toISOString());
-
+      
       // Update case status to approved/denied based on the decision
       const finalStatus = (caseId === 'PA-2024-007') ? 'denied' : 'approved';
       console.log(`✓ Updating case ${caseId} status to: ${finalStatus}`);
       statusTracker.updateCaseStatus(
-        caseId,
-        finalStatus,
-        'system',
+        caseId, 
+        finalStatus, 
+        'system', 
         'Workflow completed successfully',
         `Authorization ${finalStatus} and letter generated`
       );
       console.log(`✓ Case ${caseId} status updated successfully`);
-
+      
       setIsAnimating(false);
     }, 9000);
   };
@@ -1700,22 +1699,22 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setTimeout(() => {
       setShowMessage('✓ Member Verification complete');
       setAnimationStep(43);
-
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'member-verification'
+      
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'member-verification' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Proceed to Data Enrichment
       setTimeout(() => {
         setShowMessage('Proceeding to Data Enrichment...');
         setAnimationStep(44);
-        setProcessSteps(prev =>
-          prev.map(step =>
-            step.id === 'data-enrichment'
+        setProcessSteps(prev => 
+          prev.map(step => 
+            step.id === 'data-enrichment' 
               ? { ...step, status: 'running' }
               : step
           )
@@ -1775,22 +1774,22 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setTimeout(() => {
       setShowMessage('✓ Data Enrichment complete');
       setAnimationStep(52);
-
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'data-enrichment'
+      
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'data-enrichment' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Proceed to Gap Assessment
       setTimeout(() => {
         setShowMessage('Proceeding to Gap Assessment...');
         setAnimationStep(53);
-        setProcessSteps(prev =>
-          prev.map(step =>
-            step.id === 'gap-assessment'
+        setProcessSteps(prev => 
+          prev.map(step => 
+            step.id === 'gap-assessment' 
               ? { ...step, status: 'running' }
               : step
           )
@@ -1835,24 +1834,24 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         setShowMessage('✓ Gap Assessment complete');
         setAnimationStep(58);
       }
-
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'gap-assessment'
+      
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'gap-assessment' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Route based on case
       setTimeout(() => {
         if (caseId === 'PA-2024-004') {
           // Case-004: Skip to Provider Notification for denial
           setShowMessage('Proceeding to Provider Notification (Denial)...');
           setAnimationStep(59);
-          setProcessSteps(prev =>
-            prev.map(step =>
-              step.id === 'provider-notification'
+          setProcessSteps(prev => 
+            prev.map(step => 
+              step.id === 'provider-notification' 
                 ? { ...step, status: 'running' }
                 : step
             )
@@ -1864,9 +1863,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
           // Other cases: Proceed to Decision Prediction
           setShowMessage('Proceeding to Clinical Summarization...');
           setAnimationStep(59);
-          setProcessSteps(prev =>
-            prev.map(step =>
-              step.id === 'clinical-summarization'
+          setProcessSteps(prev => 
+            prev.map(step => 
+              step.id === 'clinical-summarization' 
                 ? { ...step, status: 'running' }
                 : step
             )
@@ -1879,7 +1878,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     }, 4000);
   };
 
-  const startClinicalSummarizationProcess = () => {
+   const startClinicalSummarizationProcess = () => {
     setIsAnimating(true);
     setAnimationStep(67);
     setShowMessage('');
@@ -1902,22 +1901,22 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setTimeout(() => {
       setShowMessage('✓ Clinical Summarization complete');
       setAnimationStep(71);
-
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'clinical-summarization'
+      
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'clinical-summarization' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Proceed to Clinical Review Planning
       setTimeout(() => {
         setShowMessage('Proceeding to Decision Assessment...');
         setAnimationStep(72);
-        setProcessSteps(prev =>
-          prev.map(step =>
-            step.id === 'data-prediction'
+        setProcessSteps(prev => 
+          prev.map(step => 
+            step.id === 'data-prediction' 
               ? { ...step, status: 'running' }
               : step
           )
@@ -1962,7 +1961,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
       setChatOpen(true);
       // Pause animation - will resume when user clicks "Continue"
       setIsAnimating(false);
-
+      
       if (caseId === 'PA-2024-003') {
         setChatMessages([
           {
@@ -1981,7 +1980,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         setChatMessages([
           {
             role: 'assistant',
-            content: caseId === 'PA-2024-008'
+            content: caseId === 'PA-2024-008' 
               ? `I've analyzed Case PA-2024-008 (Daniel de Los Santos marin - Cardiac Rehabilitation). The patient recently suffered NSTEMI with 90% LAD stenosis requiring PCI with stent placement. Post-procedure echocardiogram shows reduced ejection fraction (40%) with anterior wall hypokinesis. Patient meets all criteria for Phase II cardiac rehabilitation: recent MI with PCI, reduced EF, multiple cardiac risk factors (HTN, DM, smoking history). Evidence strongly supports cardiac rehab improves mortality and functional capacity post-MI. My recommendation is APPROVE - 36 sessions over 12 weeks. Do you have questions?`
               : `I've analyzed Case PA-2024-006 (Rebecca Hardin - CPAP Device Replacement). Based on the clinical data and similar patient outcomes, the case shows strong medical necessity. The 77% approval rate for similar cases supports an approval decision. The patient has documented OSA with AHI 8.9/hr, compliant with current CPAP therapy, and device replacement is medically necessary. My recommendation is APPROVE. Do you have questions?`
           }
@@ -2006,7 +2005,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     // Removed automatic progression - now controlled by chat dialog "Continue" button
   };
 
-
+ 
 
   const startClinicalReviewPlanningProcess = () => {
     setIsAnimating(true);
@@ -2031,22 +2030,22 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setTimeout(() => {
       setShowMessage('✓ Clinical Review Planning complete');
       setAnimationStep(77);
-
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'clinical-review-planning'
+      
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'clinical-review-planning' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Proceed to Clinical Decisioning
       setTimeout(() => {
         setShowMessage('Proceeding to Clinical Decisioning...');
         setAnimationStep(78);
-        setProcessSteps(prev =>
-          prev.map(step =>
-            step.id === 'clinical-decisioning'
+        setProcessSteps(prev => 
+          prev.map(step => 
+            step.id === 'clinical-decisioning' 
               ? { ...step, status: 'running' }
               : step
           )
@@ -2186,15 +2185,15 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     setTimeout(() => {
       setShowMessage('⏸️ Awaiting decision confirmation...');
       setAnimationStep(93);
-
-      setProcessSteps(prev =>
-        prev.map(step =>
-          step.id === 'clinical-decisioning'
+      
+      setProcessSteps(prev => 
+        prev.map(step => 
+          step.id === 'clinical-decisioning' 
             ? { ...step, status: 'completed' }
             : step
         )
       );
-
+      
       // Show decision dialog
       setIsAnimating(false);
       setDecisionDialogOpen(true);
@@ -2204,7 +2203,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
   const clearSession = () => {
     const sessionKey = `ipas_orchestration_${caseId}`;
     localStorage.removeItem(sessionKey);
-
+    
     // Reset to initial state based on case
     setProcessSteps(getInitialProcessSteps());
     setAnimationStep(0);
@@ -2219,18 +2218,18 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
     const fromRight = fromStep.position.x + 200; // 200px width
     const fromCenterX = fromStep.position.x + 100;
     const fromCenterY = fromStep.position.y + 25;
-
+    
     const toLeft = toStep.position.x;
     const toRight = toStep.position.x + 200;
     const toCenterX = toStep.position.x + 100;
     const toCenterY = toStep.position.y + 25;
-
+    
     // Determine which edges to connect
     let fromX: number, fromY: number, toX: number, toY: number;
-
+    
     const dx = toCenterX - fromCenterX;
     const dy = toCenterY - fromCenterY;
-
+    
     // Special case: Gap Assessment to Decision Prediction (right to top)
     if (fromStep.id === 'gap-assessment' && toStep.id === 'clinical-summarization') {
       // Connect from right edge to top center
@@ -2238,13 +2237,13 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
       fromY = 135;  // Gap Assessment middle (50 + 85)
       toX = 150;    // Decision Prediction top center (50 + 100)
       toY = 245;    // Decision Prediction TOP edge - 5px above (position.y - 5)
-      console.log('Gap Assessment to Decision Prediction connector:', {
-        from: `(${fromX}, ${fromY})`,
+      console.log('Gap Assessment to Decision Prediction connector:', { 
+        from: `(${fromX}, ${fromY})`, 
         to: `(${toX}, ${toY})`,
         fromDesc: 'Gap Assessment right edge',
         toDesc: 'Decision Prediction TOP center'
       });
-    }
+    } 
     // Special case: Clinical Decisioning to Provider Notification (bottom to top)
     else if (fromStep.id === 'clinical-decisioning' && toStep.id === 'provider-notification') {
       fromX = fromStep.position.x + 100; // Center of Clinical Decisioning
@@ -2264,10 +2263,10 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
       fromY = fromStep.position.y + 85; // 85px from top of block
       toY = toStep.position.y + 85;     // 85px from top of block
     }
-
+    
     // Calculate right-angle path
     let pathData: string;
-
+    
     // Special handling for Gap Assessment to Decision Prediction (right, down, left)
     if (fromStep.id === 'gap-assessment' && toStep.id === 'clinical-summarization') {
       // Go right 50px, down to target row, then left to target
@@ -2289,62 +2288,62 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
       const midY = fromY + (toY - fromY) / 2;
       pathData = `M ${fromX} ${fromY} L ${fromX} ${midY} L ${toX} ${midY} L ${toX} ${toY}`;
     }
-
-    const midX = (fromX + toX) / 2;
-    const midY = (fromY + toY) / 2;
-
-    // Check if this connector should be animated (mutually exclusive)
-    const shouldAnimateStartToIntake = isAnimating && animationStep >= 4 && animationStep < 16 && fromStep.id === 'start' && toStep.id === 'auth-intake';
-    const shouldAnimateIntakeToTriage = isAnimating && animationStep >= 16 && animationStep < 28 && fromStep.id === 'auth-intake' && toStep.id === 'auth-triage';
-    const shouldAnimateTriageToNotification = isAnimating && animationStep >= 28 && fromStep.id === 'auth-triage' && toStep.id === 'provider-notification';
-    const shouldAnimate = shouldAnimateStartToIntake || shouldAnimateIntakeToTriage || shouldAnimateTriageToNotification;
-
-    // Use downward arrowhead for Gap Assessment to Decision Prediction
-    const markerType = (fromStep.id === 'gap-assessment' && toStep.id === 'clinical-summarization')
-      ? 'url(#arrowhead-down)'
-      : 'url(#arrowhead)';
-
-    return (
-      <g key={`${fromStep.id}-${toStep.id}`}>
-        <path
-          d={pathData}
-          stroke={getStatusColor(fromStep.status)}
-          strokeWidth={shouldAnimate ? "4" : "2"}
-          fill="none"
-          markerEnd={markerType}
-          style={{
-            filter: condition ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' : 'none',
-            cursor: 'pointer',
-            transition: 'stroke-width 0.2s ease, stroke 0.2s ease',
-            strokeDasharray: shouldAnimate ? '10,5' : 'none',
-            animation: shouldAnimate ? 'dash 1s linear infinite' : 'none'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.strokeWidth = '3';
-            e.currentTarget.style.stroke = '#9c27b0'; // Violet color
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.strokeWidth = shouldAnimate ? '4' : '2';
-            e.currentTarget.style.stroke = getStatusColor(fromStep.status);
-          }}
-        />
-        {condition && (
-          <text
-            x={midX}
-            y={midY - 8}
-            fontSize="10"
-            fill="#666"
-            textAnchor="middle"
-            style={{
-              fontWeight: 'bold',
-              filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.8))'
-            }}
-          >
-            {condition}
-          </text>
-        )}
-      </g>
-    );
+    
+             const midX = (fromX + toX) / 2;
+             const midY = (fromY + toY) / 2;
+             
+             // Check if this connector should be animated (mutually exclusive)
+             const shouldAnimateStartToIntake = isAnimating && animationStep >= 4 && animationStep < 16 && fromStep.id === 'start' && toStep.id === 'auth-intake';
+             const shouldAnimateIntakeToTriage = isAnimating && animationStep >= 16 && animationStep < 28 && fromStep.id === 'auth-intake' && toStep.id === 'auth-triage';
+             const shouldAnimateTriageToNotification = isAnimating && animationStep >= 28 && fromStep.id === 'auth-triage' && toStep.id === 'provider-notification';
+             const shouldAnimate = shouldAnimateStartToIntake || shouldAnimateIntakeToTriage || shouldAnimateTriageToNotification;
+             
+             // Use downward arrowhead for Gap Assessment to Decision Prediction
+             const markerType = (fromStep.id === 'gap-assessment' && toStep.id === 'clinical-summarization') 
+               ? 'url(#arrowhead-down)' 
+               : 'url(#arrowhead)';
+             
+             return (
+               <g key={`${fromStep.id}-${toStep.id}`}>
+                 <path
+                   d={pathData}
+                   stroke={getStatusColor(fromStep.status)}
+                   strokeWidth={shouldAnimate ? "4" : "2"}
+                   fill="none"
+                   markerEnd={markerType}
+                   style={{ 
+                     filter: condition ? 'drop-shadow(0 1px 2px rgba(0,0,0,0.1))' : 'none',
+                     cursor: 'pointer',
+                     transition: 'stroke-width 0.2s ease, stroke 0.2s ease',
+                     strokeDasharray: shouldAnimate ? '10,5' : 'none',
+                     animation: shouldAnimate ? 'dash 1s linear infinite' : 'none'
+                   }}
+                   onMouseEnter={(e) => {
+                     e.currentTarget.style.strokeWidth = '3';
+                     e.currentTarget.style.stroke = '#9c27b0'; // Violet color
+                   }}
+                   onMouseLeave={(e) => {
+                     e.currentTarget.style.strokeWidth = shouldAnimate ? '4' : '2';
+                     e.currentTarget.style.stroke = getStatusColor(fromStep.status);
+                   }}
+                 />
+                 {condition && (
+                   <text
+                     x={midX}
+                     y={midY - 8}
+                     fontSize="10"
+                     fill="#666"
+                     textAnchor="middle"
+                     style={{ 
+                       fontWeight: 'bold',
+                       filter: 'drop-shadow(0 1px 1px rgba(255,255,255,0.8))'
+                     }}
+                   >
+                     {condition}
+                   </text>
+                 )}
+               </g>
+             );
   };
 
   return (
@@ -2355,15 +2354,15 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
             IPAS Flow - Case #{caseId}
           </Typography>
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            <Chip
-              label={isAnimating ? "In Progress" : "Ready"}
-              color={isAnimating ? "warning" : "success"}
-              size="small"
+            <Chip 
+              label={isAnimating ? "In Progress" : "Ready"} 
+              color={isAnimating ? "warning" : "success"} 
+              size="small" 
             />
-            <Chip
-              label={`${processSteps.filter(s => s.status === 'completed').length}/${processSteps.length} Steps Complete`}
-              color="info"
-              size="small"
+            <Chip 
+              label={`${processSteps.filter(s => s.status === 'completed').length}/${processSteps.length} Steps Complete`} 
+              color="info" 
+              size="small" 
             />
             <Button
               variant="outlined"
@@ -2381,29 +2380,29 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
 
         {/* Animation Message Display */}
         {showMessage && (
-          <Box sx={{
-            mb: 3,
-            p: 2,
-            backgroundColor: hasErrorMessage(showMessage) ? '#ffebee' :
-              animationStep >= 3 ? '#e8f5e8' : '#fff3cd',
-            border: `2px solid ${hasErrorMessage(showMessage) ? '#f44336' :
-              animationStep >= 3 ? '#4caf50' : '#ff9800'}`,
+          <Box sx={{ 
+            mb: 3, 
+            p: 2, 
+            backgroundColor: hasErrorMessage(showMessage) ? '#ffebee' : 
+                           animationStep >= 3 ? '#e8f5e8' : '#fff3cd',
+            border: `2px solid ${hasErrorMessage(showMessage) ? '#f44336' : 
+                              animationStep >= 3 ? '#4caf50' : '#ff9800'}`,
             borderRadius: 2,
             textAlign: 'center',
             animation: 'pulse 0.5s ease-in-out'
           }}>
-            <Typography
-              variant="h6"
-              sx={{
-                color: hasErrorMessage(showMessage) ? '#c62828' :
-                  animationStep >= 3 ? '#2e7d32' : '#e65100',
+            <Typography 
+              variant="h6" 
+              sx={{ 
+                color: hasErrorMessage(showMessage) ? '#c62828' : 
+                       animationStep >= 3 ? '#2e7d32' : '#e65100',
                 fontWeight: 'bold',
                 animation: animationStep >= 4 ? 'flash 0.5s ease-in-out infinite alternate' : 'none'
               }}
             >
               {showMessage}
             </Typography>
-
+            
             {/* EMR Medical Record Link */}
             {showMessage.includes('Data transmitted to EMR successfully') && (
               <Box sx={{ mt: 2 }}>
@@ -2435,10 +2434,10 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
         {/* Simple Draggable Flowchart */}
         <Box
           ref={containerRef}
-          sx={{
-            height: 700,
+          sx={{ 
+            height: 700, 
             width: '100%',
-            border: '1px solid #e0e0e0',
+            border: '1px solid #e0e0e0', 
             borderRadius: 2,
             position: 'relative',
             overflow: 'auto',
@@ -2495,13 +2494,13 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                 `}
               </style>
             </defs>
-
+            
             {/* Render connectors */}
-            {processSteps.map(step =>
+            {processSteps.map(step => 
               step.nextSteps.map(nextStepId => {
                 const nextStep = processSteps.find(s => s.id === nextStepId);
                 if (!nextStep) return null;
-
+                
                 const condition = step.conditions?.[nextStepId];
                 return renderConnector(step, nextStep, condition);
               })
@@ -2572,7 +2571,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                     onClick={(e) => {
                       e.stopPropagation();
                       const link = document.createElement('a');
-                      link.href = `${BASE_URL}/sample-documents/approval-letters/${caseId}-approval-letter.pdf`;
+                      link.href = `/sample-documents/approval-letters/${caseId}-approval-letter.pdf`;
                       link.download = `${caseId}-approval-letter.pdf`;
                       link.click();
                     }}
@@ -2607,12 +2606,12 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                 <Typography variant="h6" gutterBottom>
                   Step Details
                 </Typography>
-
+                
                 <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
                   <Chip
                     label={selectedStep.status.toUpperCase()}
-                    color={selectedStep.status === 'completed' ? 'success' :
-                      selectedStep.status === 'running' ? 'warning' : 'default'}
+                    color={selectedStep.status === 'completed' ? 'success' : 
+                           selectedStep.status === 'running' ? 'warning' : 'default'}
                   />
                   <Chip
                     label={selectedStep.type.toUpperCase()}
@@ -2686,16 +2685,16 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                   <Typography variant="h6" gutterBottom>
                     Session Management
                   </Typography>
-
+                  
                   {selectedStep.id === 'start' && selectedStep.status === 'completed' && (
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                         This step is completed. You can restart the entire workflow or continue with the next step.
                       </Typography>
                       <Box sx={{ display: 'flex', gap: 1 }}>
-                        <Button
-                          variant="contained"
-                          color="primary"
+                        <Button 
+                          variant="contained" 
+                          color="primary" 
                           size="small"
                           onClick={() => {
                             setStepDetailsOpen(false);
@@ -2704,9 +2703,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                         >
                           Restart Workflow
                         </Button>
-                        <Button
-                          variant="outlined"
-                          color="secondary"
+                        <Button 
+                          variant="outlined" 
+                          color="secondary" 
                           size="small"
                           onClick={() => {
                             setStepDetailsOpen(false);
@@ -2720,9 +2719,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                   )}
 
                   <Box sx={{ display: 'flex', gap: 1 }}>
-                    <Button
-                      variant="outlined"
-                      color="error"
+                    <Button 
+                      variant="outlined" 
+                      color="error" 
                       size="small"
                       onClick={() => {
                         clearSession();
@@ -2731,9 +2730,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                     >
                       Clear Session
                     </Button>
-                    <Button
-                      variant="outlined"
-                      color="info"
+                    <Button 
+                      variant="outlined" 
+                      color="info" 
                       size="small"
                       onClick={() => {
                         console.log('Current session state:', {
@@ -2813,11 +2812,11 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                     const userMessage = chatInput.trim();
                     setChatMessages(prev => [...prev, { role: 'user', content: userMessage }]);
                     setChatInput('');
-
+                    
                     // Simulate AI response
                     setTimeout(() => {
-                      let responses: { [key: string]: string } = {};
-
+                      let responses: {[key: string]: string} = {};
+                      
                       // Case-specific responses
                       if (caseId === 'PA-2024-006' || caseId === 'PA-2024-008') {
                         responses = {
@@ -2850,7 +2849,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                           'guidelines': 'The case meets all clinical guidelines for cardiac catheterization as per the American College of Cardiology standards.',
                         };
                       }
-
+                      
                       let response = responses.default;
                       if (userMessage.toLowerCase().includes('risk')) response = responses.risk;
                       if (userMessage.toLowerCase().includes('cost') || userMessage.toLowerCase().includes('amount')) response = responses.cost;
@@ -2863,7 +2862,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                       if (userMessage.toLowerCase().includes('lab') || userMessage.toLowerCase().includes('laboratory')) response = responses.labs || responses.default;
                       if (userMessage.toLowerCase().includes('imaging') || userMessage.toLowerCase().includes('ct') || userMessage.toLowerCase().includes('scan')) response = responses.imaging || responses.default;
                       if (userMessage.toLowerCase().includes('medically necessary') || userMessage.toLowerCase().includes('why is it medically necessary') || userMessage.toLowerCase().includes('medical necessity')) response = responses['medically necessary'] || responses.default;
-
+                      
                       setChatMessages(prev => [...prev, { role: 'assistant', content: response }]);
                     }, 1000);
                   }
@@ -2877,10 +2876,10 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                     const userMessage = chatInput.trim();
                     setChatMessages(prev => [...prev, { role: 'user', content: userMessage }]);
                     setChatInput('');
-
+                    
                     setTimeout(() => {
-                      let responses: { [key: string]: string } = {};
-
+                      let responses: {[key: string]: string} = {};
+                      
                       // Case-specific responses
                       if (caseId === 'PA-2024-006' || caseId === 'PA-2024-008') {
                         responses = {
@@ -2913,7 +2912,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                           'guidelines': 'The case meets all clinical guidelines for cardiac catheterization as per the American College of Cardiology standards.',
                         };
                       }
-
+                      
                       let response = responses.default;
                       if (userMessage.toLowerCase().includes('risk')) response = responses.risk;
                       if (userMessage.toLowerCase().includes('cost') || userMessage.toLowerCase().includes('amount')) response = responses.cost;
@@ -2926,9 +2925,9 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                       if (userMessage.toLowerCase().includes('lab') || userMessage.toLowerCase().includes('laboratory')) response = responses.labs || responses.default;
                       if (userMessage.toLowerCase().includes('imaging') || userMessage.toLowerCase().includes('ct') || userMessage.toLowerCase().includes('scan')) response = responses.imaging || responses.default;
                       if (userMessage.toLowerCase().includes('medically necessary') || userMessage.toLowerCase().includes('why is it medically necessary') || userMessage.toLowerCase().includes('medical necessity')) response = responses['medically necessary'] || responses.default;
-
-                      setChatMessages(prev => [...prev, {
-                        role: 'assistant',
+                      
+                      setChatMessages(prev => [...prev, { 
+                        role: 'assistant', 
                         content: response
                       }]);
                     }, 1000);
@@ -2943,20 +2942,20 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
             <Button onClick={() => setChatOpen(false)} variant="outlined">
               Close Chat
             </Button>
-            <Button
+            <Button 
               onClick={() => {
                 setChatOpen(false);
                 // Continue to next stage
                 setTimeout(() => {
                   setShowMessage('✓ Decision Assessment complete');
-                  setProcessSteps(prev =>
-                    prev.map(step =>
-                      step.id === 'data-prediction'
+                  setProcessSteps(prev => 
+                    prev.map(step => 
+                      step.id === 'data-prediction' 
                         ? { ...step, status: 'completed' }
                         : step
                     )
                   );
-
+                  
                   setTimeout(() => {
                     setShowMessage('Matching against clinical guidelines...');
                     setAnimationStep(65);
@@ -3005,12 +3004,12 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                   setTimeout(() => {
                     setShowMessage('✓ Guidelines matched successfully');
                     setAnimationStep(70);
-
+                    
                     setTimeout(() => {
                       setShowMessage('Proceeding to Clinical Review Planning...');
-                      setProcessSteps(prev =>
-                        prev.map(step =>
-                          step.id === 'clinical-review-planning'
+                      setProcessSteps(prev => 
+                        prev.map(step => 
+                          step.id === 'clinical-review-planning' 
                             ? { ...step, status: 'running' }
                             : step
                         )
@@ -3021,7 +3020,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                     }, 2000);
                   }, 6000);
                 }, 500);
-              }}
+              }} 
               variant="contained"
               color="primary"
             >
@@ -3056,31 +3055,31 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                 ❌ Inpatient admission not medically necessary: Patient hemodynamically stable, afebrile, normal labs, uncomplicated diverticulitis on CT. Meets criteria for outpatient management per AAFP guidelines.
               </Typography>
             )}
-
+            
             {/* Panel Members' Votes */}
             <Box sx={{ mb: 3, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 2 }}>
                 {caseId === 'PA-2024-007' ? 'Panel Review Summary (3 Doctors)' : 'Panel Review Summary (4 Doctors)'}
               </Typography>
-
+              
               {/* Gastroenterologist */}
               <Box sx={{ mb: 2, p: 1.5, bgcolor: 'white', borderRadius: 1, borderLeft: caseId === 'PA-2024-007' ? '4px solid #f44336' : '4px solid #4caf50' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                   <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                    {caseId === 'PA-2024-007' ? 'Gastroenterologist' : 'Sleep medicine specialist'}
+                     {caseId === 'PA-2024-007' ? 'Gastroenterologist' : 'Sleep medicine specialist'}
                   </Typography>
                   <Chip label={caseId === 'PA-2024-007' ? 'DENY' : 'APPROVE'} color={caseId === 'PA-2024-007' ? 'error' : 'success'} size="small" />
                 </Box>
                 <Typography variant="caption" color="text.secondary">
-                  {caseId === 'PA-2024-003'
+                  {caseId === 'PA-2024-003' 
                     ? "Given the patient's established diagnosis of OSA, the presence of multiple high-risk comorbidities, and the demonstrated clinical benefit of CPAP therapy, it is medically necessary for the patient to continue CPAP treatment."
                     : caseId === 'PA-2024-007'
-                      ? "Given the acute onset of symptoms, prior history of diverticulitis, and confirmation by imaging, it is medically necessary to initiate appropriate treatment and observation in Outpatient setting as the patient is stable, afebrile, and has no evidence of complications. Supportive therapy, dietary modifications, and symptom monitoring are essential. Antibiotics may be considered given her history, but shared decision-making and close follow-up are recommended."
-                      : "Given the patient's established diagnosis of OSA, the presence of multiple high-risk comorbidities, and the demonstrated clinical benefit of CPAP therapy, it is medically necessary for the patient to continue CPAP treatment. Discontinuation of CPAP would likely lead to worsening of OSA and significant negative health consequences."
+                    ? "Given the acute onset of symptoms, prior history of diverticulitis, and confirmation by imaging, it is medically necessary to initiate appropriate treatment and observation in Outpatient setting as the patient is stable, afebrile, and has no evidence of complications. Supportive therapy, dietary modifications, and symptom monitoring are essential. Antibiotics may be considered given her history, but shared decision-making and close follow-up are recommended."
+                    : "Given the patient's established diagnosis of OSA, the presence of multiple high-risk comorbidities, and the demonstrated clinical benefit of CPAP therapy, it is medically necessary for the patient to continue CPAP treatment. Discontinuation of CPAP would likely lead to worsening of OSA and significant negative health consequences."
                   }
                 </Typography>
               </Box>
-
+              
               {/* Infectious Disease Specialist */}
               <Box sx={{ mb: 2, p: 1.5, bgcolor: 'white', borderRadius: 1, borderLeft: caseId === 'PA-2024-007' ? '4px solid #f44336' : '4px solid #4caf50' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -3093,12 +3092,12 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                   {caseId === 'PA-2024-003'
                     ? "MRI findings confirm meniscal tear and cartilage damage. Patient has documented 6 months of failed conservative therapy including PT and anti-inflammatories. Surgical intervention is appropriate next step."
                     : caseId === 'PA-2024-007'
-                      ? "For this patient with uncomplicated acute diverticulitis, the medically necessary management includes supportive care, possible oral antibiotic therapy, pain control, and close outpatient monitoring. Inpatient admission or intravenous antibiotic therapy is not indicated unless her condition worsens or she develops signs of systemic infection or complications."
-                      : "As an Otolaryngologist, I affirm that continued CPAP therapy is medically necessary for this patient. The combined presence of anatomical (enlarged thyroid, obesity) and systemic risk factors (hypertension, arrhythmias) makes ongoing CPAP usage crucial for managing OSA and preventing serious health consequences."
+                    ? "For this patient with uncomplicated acute diverticulitis, the medically necessary management includes supportive care, possible oral antibiotic therapy, pain control, and close outpatient monitoring. Inpatient admission or intravenous antibiotic therapy is not indicated unless her condition worsens or she develops signs of systemic infection or complications."
+                    : "As an Otolaryngologist, I affirm that continued CPAP therapy is medically necessary for this patient. The combined presence of anatomical (enlarged thyroid, obesity) and systemic risk factors (hypertension, arrhythmias) makes ongoing CPAP usage crucial for managing OSA and preventing serious health consequences."
                   }
                 </Typography>
               </Box>
-
+              
               {/* General Surgeon */}
               <Box sx={{ mb: 2, p: 1.5, bgcolor: 'white', borderRadius: 1, borderLeft: caseId === 'PA-2024-007' ? '4px solid #f44336' : '4px solid #4caf50' }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
@@ -3111,28 +3110,28 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                   {caseId === 'PA-2024-003'
                     ? "Patient is 45 years old and active. Functional limitations are significant. Evidence-based guidelines support arthroscopic surgery when conservative management fails. Expected outcomes are favorable."
                     : caseId === 'PA-2024-007'
-                      ? "For this patient with uncomplicated acute diverticulitis, there is no medical necessity for surgical intervention or inpatient admission at this time. Outpatient management with supportive care and close follow-up is medically necessary, aligning with current surgical and clinical guidelines."
-                      : "As an Obesity Medicine Specialist, I strongly support the medical necessity of continued CPAP therapy for this patient. The combination of class 3 severe obesity, existing cardiovascular comorbidities, and anatomical risk factors necessitates ongoing CPAP use to optimize health outcomes, reduce morbidity, and support overall weight management efforts."
+                    ? "For this patient with uncomplicated acute diverticulitis, there is no medical necessity for surgical intervention or inpatient admission at this time. Outpatient management with supportive care and close follow-up is medically necessary, aligning with current surgical and clinical guidelines."
+                    : "As an Obesity Medicine Specialist, I strongly support the medical necessity of continued CPAP therapy for this patient. The combination of class 3 severe obesity, existing cardiovascular comorbidities, and anatomical risk factors necessitates ongoing CPAP use to optimize health outcomes, reduce morbidity, and support overall weight management efforts."
                   }
                 </Typography>
               </Box>
-
+              
               {/* Cardiologist - Only show for non-007 cases */}
               {caseId !== 'PA-2024-007' && (
                 <Box sx={{ mb: 2, p: 1.5, bgcolor: 'white', borderRadius: 1, borderLeft: '4px solid #4caf50' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      {caseId === 'PA-2024-003' ? 'Dr. David Kim, MD - Physical Medicine & Rehabilitation' : ' Cardiologist'}
-                    </Typography>
-                    <Chip label='APPROVE' color='success' size="small" />
-                  </Box>
-                  <Typography variant="caption" color="text.secondary">
-                    {caseId === 'PA-2024-003'
-                      ? "Comprehensive review of medical records shows progressive worsening despite appropriate non-surgical treatment. Functional status assessment indicates significant impact on daily activities. Approve with recommendation for post-op physical therapy."
-                      : "As a Cardiologist, I strongly affirm the medical necessity of continued CPAP therapy for this patient. Given the interplay between OSA, hypertension, arrhythmias, and severe obesity, ongoing CPAP use is essential for cardiovascular risk reduction and long-term health maintenance."
-                    }
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                    {caseId === 'PA-2024-003' ? 'Dr. David Kim, MD - Physical Medicine & Rehabilitation' : ' Cardiologist'}
                   </Typography>
+                    <Chip label='APPROVE' color='success' size="small" />
                 </Box>
+                <Typography variant="caption" color="text.secondary">
+                  {caseId === 'PA-2024-003'
+                    ? "Comprehensive review of medical records shows progressive worsening despite appropriate non-surgical treatment. Functional status assessment indicates significant impact on daily activities. Approve with recommendation for post-op physical therapy."
+                    : "As a Cardiologist, I strongly affirm the medical necessity of continued CPAP therapy for this patient. Given the interplay between OSA, hypertension, arrhythmias, and severe obesity, ongoing CPAP use is essential for cardiovascular risk reduction and long-term health maintenance."
+                  }
+                </Typography>
+              </Box>
               )}
 
               <Box sx={{ mt: 2, p: 1, bgcolor: caseId === 'PA-2024-007' ? '#ffebee' : '#e3f2fd', borderRadius: 1 }}>
@@ -3199,13 +3198,13 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
               onClick={() => {
                 setDecisionDialogOpen(false);
                 setShowMessage(`✓ Decision: ${selectedDecision?.toUpperCase()}`);
-
+                
                 // Proceed to Provider Notification
                 setTimeout(() => {
                   setShowMessage('Proceeding to Provider Notification...');
-                  setProcessSteps(prev =>
-                    prev.map(step =>
-                      step.id === 'provider-notification'
+                  setProcessSteps(prev => 
+                    prev.map(step => 
+                      step.id === 'provider-notification' 
                         ? { ...step, status: 'running' }
                         : step
                     )
@@ -3214,7 +3213,7 @@ const SimpleDraggableFlowchart: React.FC<SimpleDraggableFlowchartProps> = ({ cas
                     startProviderNotificationProcess();
                   }, 2000);
                 }, 2000);
-
+                
                 setSelectedDecision(null);
                 setJustification('');
               }}

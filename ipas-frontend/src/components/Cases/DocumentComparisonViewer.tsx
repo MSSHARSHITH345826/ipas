@@ -36,7 +36,6 @@ import {
   DataObject as JsonIcon,
 } from '@mui/icons-material';
 import { Document, Page, pdfjs } from 'react-pdf';
-import { BASE_URL } from '../../config';
 
 // Initialize PDF.js worker
 if (typeof window !== "undefined" && !pdfjs.GlobalWorkerOptions.workerSrc) {
@@ -85,17 +84,11 @@ const DocumentComparisonViewer: React.FC<DocumentComparisonViewerProps> = ({
 
   const [isEditingCell, setIsEditingCell] = useState(false);
 
-
-  const url = `${BASE_URL}` + doc.originalUrl || `${BASE_URL}` + doc.url;
-  const jsonUrl = `${BASE_URL}` + doc?.jsonUrl;
-  const extractedUrl = `${BASE_URL}` + doc?.extractedUrl;
-  const originalUrl = `${BASE_URL}` + doc?.originalUrl;
-
   useEffect(() => {
     if (open && doc) {
       loadDocumentContent();
       // Set the PDF URL with the full path
-      
+      const url = doc.originalUrl || doc.url;
       if (url) {
         // For development server, ensure we're using the correct port and public path
         setPdfUrl(url);
@@ -125,9 +118,9 @@ const DocumentComparisonViewer: React.FC<DocumentComparisonViewerProps> = ({
   const loadDocumentContent = async () => {
     setLoading(true);
     try {
-      if (jsonUrl) {
+      if (doc?.jsonUrl) {
         // Check for saved changes in localStorage first
-        const key = jsonUrl.split('/').pop() || 'temp';
+        const key = doc.jsonUrl.split('/').pop() || 'temp';
         const savedContent = localStorage.getItem(`edited_json_${key}`);
 
         if (savedContent) {
@@ -136,7 +129,7 @@ const DocumentComparisonViewer: React.FC<DocumentComparisonViewerProps> = ({
           console.log('Loaded content from localStorage');
         } else {
           // Otherwise load from the file
-          const response = await fetch(jsonUrl);
+          const response = await fetch(doc.jsonUrl);
           if (response.ok) {
             const jsonData = await response.json();
             setJsonContent(jsonData);
@@ -286,8 +279,8 @@ const DocumentComparisonViewer: React.FC<DocumentComparisonViewerProps> = ({
       const updatedContent = updateNestedValue(jsonContent, path, parsedValue);
 
       // Save to localStorage first as backup
-      if (jsonUrl) {
-        const key = jsonUrl.split('/').pop() || 'temp';
+      if (doc?.jsonUrl) {
+        const key = doc.jsonUrl.split('/').pop() || 'temp';
         localStorage.setItem(`edited_json_${key}`, JSON.stringify(updatedContent));
       }
 
@@ -297,7 +290,7 @@ const DocumentComparisonViewer: React.FC<DocumentComparisonViewerProps> = ({
       setEditedValue('');
 
       // Write changes to file system
-      const filePath = jsonUrl?.replace(window.location.origin, '');
+      const filePath = doc?.jsonUrl?.replace(window.location.origin, '');
       if (filePath) {
         try {
           // Use the browser's FileSystem API to write to the file
@@ -637,7 +630,7 @@ const DocumentComparisonViewer: React.FC<DocumentComparisonViewerProps> = ({
                               gap: 1
                             }}
                           >
-                            <Box sx={{ flexGrow: 1 }}>
+                             <Box sx={{ flexGrow: 1 }}>
                               {isEditingCell ? (
                                 <TextField
                                   fullWidth
@@ -1046,22 +1039,22 @@ const DocumentComparisonViewer: React.FC<DocumentComparisonViewerProps> = ({
         <Box sx={{ display: 'flex', gap: 1 }}>
           <Button
             startIcon={<DownloadIcon />}
-            onClick={() => handleDownload(originalUrl || url || '', `${doc?.name}-original`)}
+            onClick={() => handleDownload(doc?.originalUrl || doc?.url || '', `${doc?.name}-original`)}
           >
             Download Original
           </Button>
-          {extractedUrl && (
+          {doc?.extractedUrl && (
             <Button
               startIcon={<PdfIcon />}
-              onClick={() => handleDownload(extractedUrl!, `${doc?.name}-extracted`)}
+              onClick={() => handleDownload(doc.extractedUrl!, `${doc?.name}-extracted`)}
             >
               Download Extracted
             </Button>
           )}
-          {jsonUrl && (
+          {doc?.jsonUrl && (
             <Button
               startIcon={<JsonIcon />}
-              onClick={() => handleDownload(jsonUrl!, `${doc?.name}-structured`)}
+              onClick={() => handleDownload(doc.jsonUrl!, `${doc?.name}-structured`)}
             >
               Download Structured Data
             </Button>

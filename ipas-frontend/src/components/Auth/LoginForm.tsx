@@ -19,7 +19,6 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../../config';
 
 const LoginForm: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -75,7 +74,7 @@ const LoginForm: React.FC = () => {
             <Typography component="h1" variant="h4" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
               IPAS
             </Typography> */}
-            <img src={`${BASE_URL}/assets/images/smart_auth.svg`} alt="smart_auth-logo" />
+            <img src="/assets/images/smart_auth.svg" alt="smart_auth-logo" />
           </Box>
           
           <Typography component="h2" variant="h5" sx={{ mb: 1, textAlign: 'center' }}>

@@ -44,7 +44,6 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import SimpleDraggableFlowchart from '../Cases/SimpleDraggableFlowchart';
 import FilterListOutlinedIcon from '@mui/icons-material/FilterListOutlined';
 import { useLocation } from 'react-router-dom';
-import { BASE_URL } from '../../config';
 
 interface Case {
     id: string;
@@ -439,7 +438,7 @@ const TruCareCloudRecentCasesTable: React.FC<RecentCasesTableProps> = ({ onCaseC
                                                         onClick={() => {
                                                             // Download the approval letter PDF
                                                             const link = document.createElement('a');
-                                                            link.href = `${BASE_URL}/sample-documents/approval-letters/${caseItem.id}-approval-letter.pdf`;
+                                                            link.href = `/sample-documents/approval-letters/${caseItem.id}-approval-letter.pdf`;
                                                             link.download = `${caseItem.id}-approval-letter.pdf`;
                                                             link.click();
                                                         }}
