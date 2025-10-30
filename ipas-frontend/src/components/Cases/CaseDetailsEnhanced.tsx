@@ -1017,15 +1017,15 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                 {/* Summary Section */}
                 <Paper sx={{ p: 2, mb: 3, bgcolor: '#f5f5f5' }} variant="outlined">
                   <Grid container spacing={2}>
-                    <Grid size={{ xs: 6, md: 3 }}>
+                    <Grid size={{ xs: 6, md: 4 }}>
                       <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Patient</Typography>
                       <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.patientName}</Typography>
                     </Grid>
-                    <Grid size={{ xs: 6, md: 3 }}>
+                    <Grid size={{ xs: 6, md: 4 }}>
                       <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Procedure</Typography>
                       <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.procedure}</Typography>
                     </Grid>
-                    <Grid size={{ xs: 6, md: 3 }}>
+                    <Grid size={{ xs: 12, md: 4 }}>
                       <FormControl fullWidth >
                         <InputLabel id="demo-simple-select-label">Smart Auth recommendation </InputLabel>
                         <Select
@@ -1039,10 +1039,6 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                           <MenuItem value="Pend">Pend</MenuItem>
                         </Select>
                       </FormControl>
-                    </Grid>
-                    <Grid size={{ xs: 6, md: 3 }}>
-                      <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Processing Time</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.processingTimeline.totalDuration}</Typography>
                     </Grid>
                   </Grid>
                 </Paper>
@@ -1588,15 +1584,15 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
               {/* Summary Section */}
               <Paper sx={{ p: 2, mb: 3, bgcolor: '#f5f5f5' }}>
                 <Grid container spacing={2}>
-                  <Grid size={{ xs: 6, md: 3 }}>
+                  <Grid size={{ xs: 6, md: 4 }}>
                     <Typography variant="caption" color="text.secondary">Patient</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.patientName}</Typography>
                   </Grid>
-                  <Grid size={{ xs: 6, md: 3 }}>
+                  <Grid size={{ xs: 6, md: 4 }}>
                     <Typography variant="caption" color="text.secondary">Procedure</Typography>
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.procedure}</Typography>
                   </Grid>
-                  <Grid size={{ xs: 6, md: 3 }}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <FormControl fullWidth >
                       <InputLabel id="demo-simple-select-label">Smart Auth recommendation </InputLabel>
                       <Select
@@ -1610,10 +1606,6 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                         <MenuItem value="Pend">Pend</MenuItem>
                       </Select>
                     </FormControl>
-                  </Grid>
-                  <Grid size={{ xs: 6, md: 3 }}>
-                    <Typography variant="caption" color="text.secondary">Processing Time</Typography>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.processingTimeline.totalDuration}</Typography>
                   </Grid>
                 </Grid>
               </Paper>

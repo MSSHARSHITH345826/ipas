@@ -360,7 +360,7 @@ const TruCareCloudRecentCasesTable: React.FC<RecentCasesTableProps> = ({ onCaseC
                                 <TableCell>Priority</TableCell>
                                 {/* <TableCell>Amount</TableCell> */}
                                 <TableCell>Submitted</TableCell>
-                                <TableCell>Letter</TableCell>
+                                <TableCell>Notification</TableCell>
                                 <TableCell>Actions</TableCell>
                             </TableRow>
                         </TableHead>
