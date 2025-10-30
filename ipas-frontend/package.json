@@ -2,7 +2,6 @@
   "name": "ipas-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "/SmartAuth",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
@@ -25,8 +24,6 @@
     "@types/recharts": "^1.8.29",
     "axios": "^1.12.2",
     "dayjs": "^1.11.18",
-    "dotenv": "^16.4.7",
-    "express": "^5.1.0",
     "leaflet": "^1.9.4",
     "pdfjs-dist": "^5.4.296",
     "react": "^19.1.1",
@@ -38,7 +35,6 @@
     "react-scripts": "5.0.1",
     "reactflow": "^11.11.4",
     "recharts": "^3.2.1",
-    "serve": "^14.2.5",
     "tesseract.js": "^6.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
@@ -52,8 +48,6 @@
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "type-check": "tsc --noEmit",
     "preview": "serve -s build",
-    "serve": "node server.js",
-    "serve:production": "npm run build && node server.js",
     "analyze": "npm run build && npx bundle-analyzer build/static/js/*.js"
   },
   "eslintConfig": {
