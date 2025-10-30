@@ -53,7 +53,6 @@ import ClinicalCriteriaEval from './ClinicalCriteriaEval';
 import MedicalRecordRetrival from './MedicalRecordRetrival'
 import EMRNotificationPanel from '../Notifications/EMRNotificationPanel';
 import { statusTracker } from '../../services/statusTracker';
-import { BASE_URL } from '../../config';
 
 interface CaseDetailsEnhancedProps {
   caseId: string;
@@ -103,37 +102,17 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
   const [isProcessingReview, setIsProcessingReview] = useState(false);
   const [finalReviewStatus, setFinalReviewStatus] = useState<'approved' | 'denied' | null>(null);
 
-  // Load review status from localStorage on component mount and monitor status changes
+  // Load review status from localStorage on component mount
   React.useEffect(() => {
-    const checkAndUpdateReviewStatus = () => {
-      const savedReviewStatus = localStorage.getItem(`review_completed_${caseId}`);
-      const savedFinalStatus = localStorage.getItem(`final_review_status_${caseId}`);
-      
-      // Check current case status from statusTracker
-      const currentCaseStatus = statusTracker.getCaseStatus(caseId);
-      
-      // If case status is pending, reset the review completed state
-      if (currentCaseStatus?.currentStatus === 'pending') {
-        setReviewCompleted(false);
-        setFinalReviewStatus(null);
-        // Clear localStorage
-        localStorage.removeItem(`review_completed_${caseId}`);
-        localStorage.removeItem(`final_review_status_${caseId}`);
-      } else if (savedReviewStatus === 'true') {
-        setReviewCompleted(true);
-        if (savedFinalStatus === 'approved' || savedFinalStatus === 'denied') {
-          setFinalReviewStatus(savedFinalStatus as 'approved' | 'denied');
-        }
+    const savedReviewStatus = localStorage.getItem(`review_completed_${caseId}`);
+    const savedFinalStatus = localStorage.getItem(`final_review_status_${caseId}`);
+    
+    if (savedReviewStatus === 'true') {
+      setReviewCompleted(true);
+      if (savedFinalStatus === 'approved' || savedFinalStatus === 'denied') {
+        setFinalReviewStatus(savedFinalStatus as 'approved' | 'denied');
       }
-    };
-
-    // Initial check
-    checkAndUpdateReviewStatus();
-
-    // Poll for status changes every 1 second
-    const interval = setInterval(checkAndUpdateReviewStatus, 1000);
-
-    return () => clearInterval(interval);
+    }
   }, [caseId]);
 
   // Function to handle review completion
@@ -190,7 +169,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                          caseId === 'PA-2024-007' ? 'case-007' : 
                          caseId === 'PA-2024-008' ? '008' : 'case-001-john-doe';
       
-      const response = await fetch(`${BASE_URL}/sample-documents/cases/${folderPath}/observability_and_explanation.json`);
+      const response = await fetch(`/sample-documents/cases/${folderPath}/observability_and_explanation.json`);
       const jsonData = await response.json();
       
       // Create a printable HTML content
@@ -682,7 +661,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
     return caseDataMap[caseId] || {
       id: caseId,
       patientName: 'Unknown Patient',
-      patientId: 'PA-2024-005',
+      patientId: 'PA-UNKNOWN',
       dateOfBirth: 'Unknown',
       provider: 'Unknown Provider',
       providerId: 'PR-UNKNOWN',
@@ -731,7 +710,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
           caseId === 'PA-2024-008' ? '008':
           'case-001-john-doe';
 
-          const response = await fetch(`${BASE_URL}/sample-documents/cases/${folderName}/observability_and_explanation.json`);
+          const response = await fetch(`/sample-documents/cases/${folderName}/observability_and_explanation.json`);
 
           if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -822,7 +801,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                   onClick={async () => {
                     try {
                       const folderName = caseId === 'PA-2024-001' ? 'case-001-john-doe' : caseId === 'PA-2024-002' ? 'case-002-jane-smith' : caseId === 'PA-2024-003' ? 'case-003-mike-johnson' : caseId === 'PA-2024-004' ? 'case-004-sarah-wilson' : caseId === 'PA-2024-005' ? 'case-005-david-brown' : caseId === 'PA-2024-006' ? 'case-006-rebecca-hardin' : caseId === 'PA-2024-007' ? 'case-007' : caseId === 'PA-2024-008' ? '008' : 'case-001-john-doe';
-                      const response = await fetch(`${BASE_URL}/sample-documents/cases/${folderName}/observability_and_explanation.json`);
+                      const response = await fetch(`/sample-documents/cases/${folderName}/observability_and_explanation.json`);
                       const data = await response.json();
                       setObservabilityData(data);
                       setObservabilityDialogOpen(true);
@@ -869,7 +848,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                   disabled={!reviewCompleted}
                   onClick={() => {
                     const link = document.createElement('a');
-                    link.href = `${BASE_URL}/sample-documents/cases/${caseId === 'PA-2024-001' ? 'case-001-john-doe' : caseId === 'PA-2024-002' ? 'case-002-jane-smith' : caseId === 'PA-2024-003' ? 'case-003-mike-johnson' : caseId === 'PA-2024-004' ? 'case-004-sarah-wilson' : caseId === 'PA-2024-005' ? 'case-005-david-brown' : caseId === 'PA-2024-006' ? 'case-006-rebecca-hardin' : caseId === 'PA-2024-007' ? 'case-007' : caseId === 'PA-2024-008' ? '008' : 'case-001-john-doe'}/observability_and_explanation.json`;
+                    link.href = `/sample-documents/cases/${caseId === 'PA-2024-001' ? 'case-001-john-doe' : caseId === 'PA-2024-002' ? 'case-002-jane-smith' : caseId === 'PA-2024-003' ? 'case-003-mike-johnson' : caseId === 'PA-2024-004' ? 'case-004-sarah-wilson' : caseId === 'PA-2024-005' ? 'case-005-david-brown' : caseId === 'PA-2024-006' ? 'case-006-rebecca-hardin' : caseId === 'PA-2024-007' ? 'case-007' : caseId === 'PA-2024-008' ? '008' : 'case-001-john-doe'}/observability_and_explanation.json`;
                     link.download = `observability_and_explanation_${caseId}.json`;
                     link.click();
                   }}
@@ -1168,15 +1147,15 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                           <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Authorization Number</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.approvalDetails.authorizationNumber}</Typography>
                         </Grid>
-                        {/* <Grid size={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Approved Amount</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'success.main' }}>{observabilityData.approvalDetails.approvedAmount}</Typography>
-                        </Grid> */}
+                        </Grid>
                         <Grid size={{ xs: 12, md: 4 }}>
                           <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Valid Until</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.approvalDetails.validUntil}</Typography>
                         </Grid>
-                        <Grid size={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 6 }}>
                           <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Approved By</Typography>
                           <Typography variant="body2">{observabilityData.approvalDetails.approvedBy}</Typography>
                         </Grid>
@@ -1725,7 +1704,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                         <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.approvalDetails.authorizationNumber}</Typography>
                       </Grid>
                       <Grid size={{ xs: 12, md: 4 }}>
-                        <Typography variant="caption" color="text.secondary"></Typography>
+                        <Typography variant="caption" color="text.secondary">Approved Amount</Typography>
                         <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'success.main' }}>{observabilityData.approvalDetails.approvedAmount}</Typography>
                       </Grid>
                       <Grid size={{ xs: 12, md: 4 }}>
@@ -1767,7 +1746,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
             startIcon={<DownloadIcon />}
             onClick={() => {
               const link = document.createElement('a');
-              link.href = `${BASE_URL}/sample-documents/cases/${caseId === 'PA-2024-001' ? 'case-001-john-doe' : caseId === 'PA-2024-002' ? 'case-002-jane-smith' : caseId === 'PA-2024-003' ? 'case-003-mike-johnson' : caseId === 'PA-2024-004' ? 'case-004-sarah-wilson' : caseId === 'PA-2024-005' ? 'case-005-david-brown' : caseId === 'PA-2024-006' ? 'case-006-rebecca-hardin' : caseId === 'PA-2024-007' ? 'case-007' : caseId === 'PA-2024-008' ? '008' : 'case-001-john-doe'}/observability_and_explanation.json`;
+              link.href = `/sample-documents/cases/${caseId === 'PA-2024-001' ? 'case-001-john-doe' : caseId === 'PA-2024-002' ? 'case-002-jane-smith' : caseId === 'PA-2024-003' ? 'case-003-mike-johnson' : caseId === 'PA-2024-004' ? 'case-004-sarah-wilson' : caseId === 'PA-2024-005' ? 'case-005-david-brown' : caseId === 'PA-2024-006' ? 'case-006-rebecca-hardin' : caseId === 'PA-2024-007' ? 'case-007' : caseId === 'PA-2024-008' ? '008' : 'case-001-john-doe'}/observability_and_explanation.json`;
               link.download = `observability_and_explanation_${caseId}.json`;
               link.click();
             }}

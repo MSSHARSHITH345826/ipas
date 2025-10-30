@@ -322,7 +322,7 @@ const RecentCasesTable: React.FC<RecentCasesTableProps> = ({ onCaseClick }) => {
                 <TableCell>Priority</TableCell>
                 <TableCell>Amount</TableCell>
                 <TableCell>Submitted</TableCell>
-                <TableCell>Letter</TableCell>
+                <TableCell>Notification</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>

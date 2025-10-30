@@ -1,6 +1,6 @@
 {
   "policy_name": "Positive Airway Pressure (PAP) Devices for the Treatment of Obstructive Sleep Apnea",
-  "lcd_number": "L33718",
+  "lcd_number": "L33611",
   "effective_date": "10/01/2015",
   "last_revised": "04/25/2024",
   "contractor": "Medicare Administrative Contractor",
@@ -40,7 +40,7 @@
       "Current PAP device is 5+ years old, meeting standard replacement timeframe",
       "Patient demonstrates excellent compliance with CPAP therapy (Epworth score 3/24)",
       "Medical necessity clearly documented for continued PAP therapy",
-      "Replacement aligns with Medicare LCD L33718 criteria"
+      "Replacement aligns with Medicare LCD L33611 criteria"
     ]
   },
   "medical_necessity_justification": {

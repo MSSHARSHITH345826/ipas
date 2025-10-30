@@ -99,8 +99,8 @@ const Tasks: React.FC = () => {
                         Tasks
                     </Typography>
                     <ButtonGroup variant="outlined" size='small' color='inherit' aria-label="Basic button group">
-                        <Button sx={{ lineHeight: 'normal' }}>My Tasks</Button>
-                        <Button sx={{ lineHeight: 'normal', background: '#4a387e', color: '#fff', borderColor: '#4a387e' }}>Group Queues</Button>
+                        <Button sx={{ lineHeight: 'normal', background: '#4a387e', color: '#fff', borderColor: '#4a387e' }}>My Tasks</Button>
+                        <Button sx={{ lineHeight: 'normal' }}>Group Queues</Button>
                         <Button sx={{ lineHeight: 'normal' }}>Personal Queues</Button>
                     </ButtonGroup>
                 </Box>
