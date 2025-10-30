@@ -102,37 +102,17 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
   const [isProcessingReview, setIsProcessingReview] = useState(false);
   const [finalReviewStatus, setFinalReviewStatus] = useState<'approved' | 'denied' | null>(null);
 
-  // Load review status from localStorage on component mount and monitor status changes
+  // Load review status from localStorage on component mount
   React.useEffect(() => {
-    const checkAndUpdateReviewStatus = () => {
-      const savedReviewStatus = localStorage.getItem(`review_completed_${caseId}`);
-      const savedFinalStatus = localStorage.getItem(`final_review_status_${caseId}`);
-      
-      // Check current case status from statusTracker
-      const currentCaseStatus = statusTracker.getCaseStatus(caseId);
-      
-      // If case status is pending, reset the review completed state
-      if (currentCaseStatus?.currentStatus === 'pending') {
-        setReviewCompleted(false);
-        setFinalReviewStatus(null);
-        // Clear localStorage
-        localStorage.removeItem(`review_completed_${caseId}`);
-        localStorage.removeItem(`final_review_status_${caseId}`);
-      } else if (savedReviewStatus === 'true') {
-        setReviewCompleted(true);
-        if (savedFinalStatus === 'approved' || savedFinalStatus === 'denied') {
-          setFinalReviewStatus(savedFinalStatus as 'approved' | 'denied');
-        }
+    const savedReviewStatus = localStorage.getItem(`review_completed_${caseId}`);
+    const savedFinalStatus = localStorage.getItem(`final_review_status_${caseId}`);
+    
+    if (savedReviewStatus === 'true') {
+      setReviewCompleted(true);
+      if (savedFinalStatus === 'approved' || savedFinalStatus === 'denied') {
+        setFinalReviewStatus(savedFinalStatus as 'approved' | 'denied');
       }
-    };
-
-    // Initial check
-    checkAndUpdateReviewStatus();
-
-    // Poll for status changes every 1 second
-    const interval = setInterval(checkAndUpdateReviewStatus, 1000);
-
-    return () => clearInterval(interval);
+    }
   }, [caseId]);
 
   // Function to handle review completion
@@ -437,7 +417,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
       'PA-2024-002': {
         id: 'PA-2024-002',
         patientName: 'Mary Johnson',
-        patientId: 'PA-2024-002',
+        patientId: 'P-2024-002',
         dateOfBirth: '1972-08-22',
         provider: 'Dr. Michael Chen',
         providerId: 'PR-002',
@@ -474,7 +454,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
       'PA-2024-003': {
         id: 'PA-2024-003',
         patientName: 'Robert Davis',
-        patientId: 'PA-2024-003',
+        patientId: 'P-2024-003',
         dateOfBirth: '1965-12-03',
         provider: 'Dr. Emily Rodriguez',
         providerId: 'PR-003',
@@ -511,7 +491,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
       'PA-2024-004': {
         id: 'PA-2024-004',
         patientName: 'Lisa Wilson',
-        patientId: 'PA-2024-004',
+        patientId: 'P-2024-004',
         dateOfBirth: '1985-03-15',
         provider: 'Andrew Thomson',
         providerId: 'PR-004',
@@ -637,7 +617,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
       'PA-2024-008': {
         id: 'PA-2024-008',
         patientName: 'Daniel de Los Santos marin',
-        patientId: 'PA-2024-008',
+        patientId: 'P-2024-008',
         dateOfBirth: '1947-08-01',
         provider: 'Dr. Amanda Reynolds',
         providerId: 'NPI-1234567890',
@@ -681,7 +661,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
     return caseDataMap[caseId] || {
       id: caseId,
       patientName: 'Unknown Patient',
-      patientId: 'PA-2024-005',
+      patientId: 'P-UNKNOWN',
       dateOfBirth: 'Unknown',
       provider: 'Unknown Provider',
       providerId: 'PR-UNKNOWN',
@@ -1167,15 +1147,15 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                           <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Authorization Number</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.approvalDetails.authorizationNumber}</Typography>
                         </Grid>
-                        {/* <Grid size={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 4 }}>
                           <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Approved Amount</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'success.main' }}>{observabilityData.approvalDetails.approvedAmount}</Typography>
-                        </Grid> */}
+                        </Grid>
                         <Grid size={{ xs: 12, md: 4 }}>
                           <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Valid Until</Typography>
                           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.approvalDetails.validUntil}</Typography>
                         </Grid>
-                        <Grid size={{ xs: 12, md: 4 }}>
+                        <Grid size={{ xs: 12, md: 6 }}>
                           <Typography variant="caption" color="text.secondary" sx={{fontSize:'14px'}}>Approved By</Typography>
                           <Typography variant="body2">{observabilityData.approvalDetails.approvedBy}</Typography>
                         </Grid>
@@ -1724,7 +1704,7 @@ const CaseDetailsEnhanced: React.FC<CaseDetailsEnhancedProps> = ({ caseId, defau
                         <Typography variant="body2" sx={{ fontWeight: 'bold' }}>{observabilityData.approvalDetails.authorizationNumber}</Typography>
                       </Grid>
                       <Grid size={{ xs: 12, md: 4 }}>
-                        <Typography variant="caption" color="text.secondary"></Typography>
+                        <Typography variant="caption" color="text.secondary">Approved Amount</Typography>
                         <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'success.main' }}>{observabilityData.approvalDetails.approvedAmount}</Typography>
                       </Grid>
                       <Grid size={{ xs: 12, md: 4 }}>

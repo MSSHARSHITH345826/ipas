@@ -3,7 +3,7 @@
   "extractionTimestamp": "2024-01-16T10:30:00Z",
   "patientInformation": {
     "patientName": "Mary Johnson",
-    "patientId": "PA-2024-002",
+    "patientId": "P-2024-002",
     "dateOfBirth": "1972-08-22",
     "gender": "Female",
     "phoneNumber": "(555) 234-5678",
