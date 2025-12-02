@@ -7,41 +7,39 @@ import {
   Typography,
   Avatar,
   Chip,
-  Button,
   Divider,
-  Card,
-  CardContent,
   LinearProgress,
-  Tooltip
+  Alert
 } from '@mui/material';
 import {
   Send as SendIcon,
   SmartToy as AIIcon,
-  Person as PersonIcon,
-  Visibility as VisibilityIcon,
-  Assessment as AssessmentIcon,
-  Psychology as PsychologyIcon
+  Person as PersonIcon
 } from '@mui/icons-material';
-import { ChatMessage, SimulationResult } from '../../types';
+import { ChatMessage } from '../../types';
+import { sendChatMessage } from '../../services/chatService';
 
 interface ChatInterfaceProps {
   caseId?: string;
-  onSimulationRequest?: () => void;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseId, onSimulationRequest }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseId }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
       sender: 'ai',
-      content: 'Hello! I\'m the IPAS AI assistant. I can help you analyze prior authorization cases, explain decisions, and run simulations. How can I assist you today?',
+      content: caseId 
+        ? `Hello! I'm the IPAS AI assistant for case ${caseId}. I have access to all the case documents and clinical guidelines. Ask me anything about this case!`
+        : 'Hello! I\'m the IPAS AI assistant. I can help you analyze prior authorization cases, explain decisions, and run simulations. How can I assist you today?',
       timestamp: new Date().toISOString(),
       type: 'text'
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [conversationHistory, setConversationHistory] = useState<Array<{role: 'user' | 'assistant', content: string}>>([]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -52,7 +50,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseId, onSimulationReque
   }, [messages]);
 
   const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || !caseId) return;
 
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
@@ -63,44 +61,49 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseId, onSimulationReque
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputMessage;
     setInputMessage('');
     setIsTyping(true);
+    setError(null);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Call the real chat service with case-specific knowledge
+      const response = await sendChatMessage(caseId, currentInput, conversationHistory);
+      
       const aiResponse: ChatMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'ai',
-        content: generateAIResponse(inputMessage),
+        content: response.response,
         timestamp: new Date().toISOString(),
         type: 'text'
       };
+      
       setMessages(prev => [...prev, aiResponse]);
+      
+      // Update conversation history for context
+      setConversationHistory(prev => [
+        ...prev,
+        { role: 'user', content: currentInput },
+        { role: 'assistant', content: response.response }
+      ]);
+      
+    } catch (error: any) {
+      console.error('Chat error:', error);
+      setError(error.message || 'Failed to get response. Please try again.');
+      
+      const errorMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        sender: 'ai',
+        content: 'I apologize, but I encountered an error processing your request. Please try again or rephrase your question.',
+        timestamp: new Date().toISOString(),
+        type: 'text'
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
-  const generateAIResponse = (userInput: string): string => {
-    const lowerInput = userInput.toLowerCase();
-    
-    if (lowerInput.includes('simulation') || lowerInput.includes('analyze')) {
-      return 'I can run a detailed analysis simulation for this case. This will show you the decision process, criteria checks, and confidence levels. Would you like me to proceed with the simulation?';
-    }
-    
-    if (lowerInput.includes('criteria') || lowerInput.includes('guideline')) {
-      return 'Based on the clinical guidelines, I check several criteria including medical necessity, coverage eligibility, and clinical appropriateness. For this case, the key criteria are oxygen saturation levels, severity of symptoms, and response to outpatient treatment.';
-    }
-    
-    if (lowerInput.includes('decision') || lowerInput.includes('recommendation')) {
-      return 'My recommendation is based on a comprehensive analysis of the patient\'s clinical data, insurance coverage, and medical guidelines. I consider factors like severity of illness, treatment response, and alternative care options.';
-    }
-    
-    if (lowerInput.includes('help') || lowerInput.includes('what can you do')) {
-      return 'I can help you with case analysis, decision explanations, criteria verification, simulation of different scenarios, and answering questions about prior authorization processes. What would you like to know?';
-    }
-    
-    return 'I understand your question. Let me analyze the case data and provide you with a comprehensive response based on the available information and clinical guidelines.';
-  };
 
   const handleKeyPress = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter' && !event.shiftKey) {
@@ -109,24 +112,89 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseId, onSimulationReque
     }
   };
 
-  const handleSimulation = () => {
-    if (onSimulationRequest) {
-      onSimulationRequest();
-    }
-    
-    const simulationMessage: ChatMessage = {
-      id: Date.now().toString(),
-      sender: 'ai',
-      content: 'Running simulation analysis...',
-      timestamp: new Date().toISOString(),
-      type: 'simulation'
-    };
-    
-    setMessages(prev => [...prev, simulationMessage]);
-  };
-
   const formatTime = (timestamp: string) => {
     return new Date(timestamp).toLocaleTimeString();
+  };
+
+  // Format message content with markdown-style formatting
+  const formatMessageContent = (content: string) => {
+    // Split by lines to process each line
+    const lines = content.split('\n');
+    
+    return lines.map((line, index) => {
+      // Skip empty lines but preserve spacing
+      if (line.trim() === '') {
+        return <Box key={index} sx={{ height: '8px' }} />;
+      }
+
+      // Check for bold headers (**text**)
+      if (line.includes('**')) {
+        const parts = line.split(/(\*\*.*?\*\*)/g);
+        return (
+          <Typography 
+            key={index} 
+            variant="body1" 
+            sx={{ 
+              mb: 0.5,
+              fontWeight: line.startsWith('**') ? 'bold' : 'normal',
+              fontSize: line.startsWith('**') ? '1.05rem' : '1rem'
+            }}
+          >
+            {parts.map((part, i) => {
+              if (part.startsWith('**') && part.endsWith('**')) {
+                return <strong key={i}>{part.slice(2, -2)}</strong>;
+              }
+              return part;
+            })}
+          </Typography>
+        );
+      }
+
+      // Bullet points (•) or (-)
+      if (line.trim().startsWith('•') || line.trim().startsWith('-')) {
+        return (
+          <Typography 
+            key={index} 
+            variant="body2" 
+            sx={{ 
+              ml: 2, 
+              mb: 0.3,
+              display: 'flex',
+              alignItems: 'flex-start'
+            }}
+          >
+            <span style={{ marginRight: '8px', minWidth: '16px' }}>
+              {line.trim().startsWith('•') ? '•' : '•'}
+            </span>
+            <span>{line.trim().substring(1).trim()}</span>
+          </Typography>
+        );
+      }
+
+      // Numbered lists (1., 2., etc.)
+      if (/^\s*\d+\./.test(line)) {
+        return (
+          <Typography 
+            key={index} 
+            variant="body2" 
+            sx={{ 
+              ml: 2, 
+              mb: 0.3,
+              fontWeight: 500
+            }}
+          >
+            {line.trim()}
+          </Typography>
+        );
+      }
+
+      // Regular text
+      return (
+        <Typography key={index} variant="body2" sx={{ mb: 0.3 }}>
+          {line}
+        </Typography>
+      );
+    });
   };
 
   return (
@@ -146,6 +214,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseId, onSimulationReque
             />
           )}
         </Box>
+
+        {!caseId && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            Please select a case to start chatting. The AI needs case-specific context to provide accurate answers.
+          </Alert>
+        )}
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
 
         <Box sx={{ flexGrow: 1, overflow: 'auto', mb: 2, maxHeight: '60vh' }}>
           {messages.map((message) => (
@@ -184,24 +264,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseId, onSimulationReque
                       borderRadius: 2
                     }}
                   >
-                    <Typography variant="body1">{message.content}</Typography>
+                    {message.sender === 'ai' ? (
+                      <Box>{formatMessageContent(message.content)}</Box>
+                    ) : (
+                      <Typography variant="body1">{message.content}</Typography>
+                    )}
                     <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
                       {formatTime(message.timestamp)}
                     </Typography>
                   </Paper>
-                  
-                  {message.type === 'simulation' && (
-                    <Box sx={{ mt: 1 }}>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<AssessmentIcon />}
-                        onClick={handleSimulation}
-                      >
-                        Run Simulation
-                      </Button>
-                    </Box>
-                  )}
                 </Box>
               </Box>
             </Box>
@@ -226,39 +297,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ caseId, onSimulationReque
 
         <Divider sx={{ my: 2 }} />
 
-        <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-          <Button
-            variant="outlined"
-            startIcon={<VisibilityIcon />}
-            onClick={handleSimulation}
-            size="small"
-          >
-            Analyze & Visualize
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<PsychologyIcon />}
-            size="small"
-          >
-            Explain Decision
-          </Button>
-        </Box>
-
         <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField
             fullWidth
-            placeholder="Ask me anything about this case..."
+            placeholder={caseId ? "Ask me anything about this case..." : "Select a case to start chatting..."}
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             multiline
             maxRows={3}
-            disabled={isTyping}
+            disabled={isTyping || !caseId}
           />
           <IconButton
             color="primary"
             onClick={handleSendMessage}
-            disabled={!inputMessage.trim() || isTyping}
+            disabled={!inputMessage.trim() || isTyping || !caseId}
           >
             <SendIcon />
           </IconButton>

@@ -70,8 +70,8 @@ export async function sendChatMessage(
     const kb = await knowledgeBaseService.getKnowledgeBase(caseId);
     console.log(`📚 KB: ${kb.chunks.length} chunks from ${kb.documentCount} docs`);
     
-    // Search for relevant chunks (80 chunks - balanced coverage)
-    const chunks = knowledgeBaseService.searchKnowledgeBase(kb, userMessage, 80);
+    // Search for relevant chunks (120 chunks - comprehensive coverage for all documents)
+    const chunks = knowledgeBaseService.searchKnowledgeBase(kb, userMessage, 120);
     console.log(`🔍 Found ${chunks.length} relevant chunks`);
     
     if (chunks.length > 0) {
@@ -82,26 +82,93 @@ export async function sendChatMessage(
       return { response: `I couldn't find information about "${userMessage}" in the case documents.` };
     }
     
-    // Build context
+    // Build context - ensure all document types are represented
     const context = chunks.map(c => c.content).join('\n\n');
     
-    const systemPrompt = `You are a medical AI assistant for case ${caseId}.
+    const systemPrompt = `You are a medical AI assistant for case ${caseId}. You have access to comprehensive case information including medical records, clinical notes, medical history, lab results, imaging reports, prior authorization forms, insurance information, and clinical guidelines.
 
 Case Information:
 ${context}
 
-Instructions:
-- Provide clear, complete answers using relevant information from the documents
-- Include important details: dates, values, findings, diagnoses
-- Be thorough but concise - cover key points without excessive detail
-- Use exact data from medical records when relevant
-- Organize information clearly`;
+CRITICAL FORMATTING INSTRUCTIONS - ALWAYS FOLLOW:
+
+1. STRUCTURE YOUR RESPONSE COMPREHENSIVELY:
+   - Use clear headings and subheadings
+   - Break information into logical sections
+   - Use bullet points (•) for lists
+   - Use numbered lists (1., 2., 3.) for sequential information or procedures
+   - Use line breaks between sections for readability
+
+2. RESPONSE FORMAT TEMPLATE (adapt based on question type):
+
+   **[Main Topic/Answer]**
+   
+   **Key Findings:**
+   • Point 1 with specific details
+   • Point 2 with values/dates
+   • Point 3 with clinical observations
+   
+   **Detailed Information:**
+   
+   1. [First Category]
+      • Detail with exact values
+      • Date or timeline information
+      • Relevant context
+   
+   2. [Second Category]
+      • Specific findings
+      • Clinical significance
+      • Relevant measurements
+   
+   **Clinical Significance:**
+   • Why this matters
+   • Impact on treatment/authorization
+   • Relevant guidelines or criteria
+
+3. CONTENT REQUIREMENTS:
+   - Include ALL relevant details from medical history, demographics, vital signs, medications, allergies
+   - Use exact values, dates, and measurements from documents
+   - Explain clinical significance when relevant
+   - Be thorough but organized
+   - Focus on clarity and readability
+
+4. FORMATTING RULES:
+   - Use **bold** for section headers
+   - Use bullet points (•) for easy scanning
+   - Keep related information grouped together
+   - Add blank lines between major sections
+   - Use indentation for sub-points
+
+Example Response Format:
+
+**Patient's Medical History**
+
+**Chronic Conditions:**
+• Hypertension - diagnosed 2018, currently controlled
+• Type 2 Diabetes - on metformin 1000mg BID
+• Sleep Apnea - AHI 28 events/hour (moderate-severe)
+
+**Surgical History:**
+1. Appendectomy - 2015
+2. Knee arthroscopy - 2020
+
+**Medications:**
+• Lisinopril 10mg daily (blood pressure)
+• Metformin 1000mg twice daily (diabetes)
+• Atorvastatin 20mg nightly (cholesterol)
+
+**Clinical Significance:**
+• Multiple comorbidities requiring coordinated care management
+• Sleep apnea severity requires therapeutic intervention
+
+Remember: ALWAYS structure responses this way for maximum clarity and ease of understanding!`;
 
 
     
+    // Include more conversation history for better context (last 8 messages)
     const messages: Message[] = [
       { role: 'system', content: systemPrompt },
-      ...conversationHistory.slice(-6),
+      ...conversationHistory.slice(-8),
       { role: 'user', content: userMessage }
     ];
     
@@ -120,7 +187,7 @@ Instructions:
         body: JSON.stringify({
           messages: messages,
           temperature: 0.7,
-          max_tokens: 8000, // Balanced - thorough but not excessive
+          max_tokens: 12000, // Increased for comprehensive responses covering all document details
           top_p: 0.95,
           frequency_penalty: 0,
           presence_penalty: 0
@@ -138,8 +205,9 @@ Instructions:
 
     let answer = data.choices[0].message.content;
     
-    // Clean response
-    answer = answer.replace(/\*\*/g, '').replace(/\*/g, '').replace(/_/g, '').replace(/`/g, '');
+    // Preserve formatting for structured responses (keep **, *, bullets, etc.)
+    // Only remove problematic characters if any
+    answer = answer.trim();
     
     return { response: answer };
     

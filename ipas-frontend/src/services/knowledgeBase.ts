@@ -52,30 +52,37 @@ class KnowledgeBaseService {
     // Add case-specific guidelines FIRST (high priority)
     chunks.push(...this.getCaseSpecificGuidelines(caseId));
     
-    // Define all files to load
+    // Define all files to load - comprehensive list to ensure all documents are included
     const jsonFiles = [
-      'medical_records.json', 'MedicalRecords.json', 'doctor-notes.json',
-      'physician-notes.json', 'cardiology-notes.json', 'polysomnography.json',
-      'lab-results.json', 'laboratory-study.json', '2d-doppler-study.json',
-      'electrocardiogram.json', 'observability_and_explanation.json',
-      'clinical-criteria-evaluation.json', 'LCDClinicalSummary-criteriaeval.json',
-      'prior-auth-form-extracted.json', 'prior-auth-request-form.json',
-      'AuthReq.json', 'PAP-policy.json', 'PAP_Device_Policy.json',
-      'insurance-card.json', 'patient-medical-history.json',
-      'operative-report.json', 'discharge-summary.json', 'stress-test-results.json'
+      'medical_records.json', 'MedicalRecords.json', 'medical-records.json',
+      'doctor-notes.json', 'physician-notes.json', 'cardiology-notes.json',
+      'polysomnography.json', 'lab-results.json', 'laboratory-study.json',
+      '2d-doppler-study.json', 'electrocardiogram.json', 
+      'observability_and_explanation.json', 'clinical-criteria-evaluation.json',
+      'LCDClinicalSummary-criteriaeval.json', 'prior-auth-form-extracted.json',
+      'prior-auth-request-form.json', 'AuthReq.json', 'PAP-policy.json',
+      'PAP_Device_Policy.json', 'insurance-card.json', 
+      'patient-medical-history.json', 'medical-history.json', 'patient-history.json',
+      'operative-report.json', 'discharge-summary.json', 'stress-test-results.json',
+      'clinical-summary.json', 'patient-demographics.json', 'medications.json',
+      'allergies.json', 'vital-signs.json', 'progress-notes.json',
+      'consultation-notes.json', 'radiology-report.json', 'pathology-report.json'
     ];
 
     const txtFiles = [
       'EMR007.txt', 'EMR008.txt', 'EMR.txt', 'AuthReq.txt',
-      'MedicalRecordJson.txt', 'clinical-notes.txt'
+      'MedicalRecordJson.txt', 'clinical-notes.txt', 'medical-history.txt',
+      'patient-history.txt', 'doctor-notes.txt', 'physician-notes.txt'
     ];
 
     const pdfFiles = [
-      'medical_records.pdf', 'doctor-notes.pdf', 'polysomnography.pdf',
-      'lab-results.pdf', 'laboratory-study.pdf', 'operative-report.pdf',
-      'discharge-summary.pdf', '2d-doppler-study.pdf', 'electrocardiogram.pdf',
-      'prior-auth-form-original.pdf', 'insurance-card.pdf',
-      'patient-medical-history.pdf', 'cardiology-notes.pdf'
+      'medical_records.pdf', 'medical-records.pdf', 'doctor-notes.pdf',
+      'polysomnography.pdf', 'lab-results.pdf', 'laboratory-study.pdf',
+      'operative-report.pdf', 'discharge-summary.pdf', '2d-doppler-study.pdf',
+      'electrocardiogram.pdf', 'prior-auth-form-original.pdf', 'insurance-card.pdf',
+      'patient-medical-history.pdf', 'medical-history.pdf', 'patient-history.pdf',
+      'cardiology-notes.pdf', 'physician-notes.pdf', 'clinical-summary.pdf',
+      'radiology-report.pdf', 'pathology-report.pdf'
     ];
 
     // Load all files in PARALLEL for speed
@@ -398,11 +405,11 @@ class KnowledgeBaseService {
       return [
         {
           id: 'cms-lcd-full-1',
-          content: 'CMS LCD L33611 - Oral Appliances for Obstructive Sleep Apnea (OSA). Coverage Requirements: 1) Diagnosis of OSA must be established by polysomnography (sleep study) showing Apnea-Hypopnea Index (AHI) or Respiratory Disturbance Index (RDI) ≥15 events/hour, OR AHI/RDI ≥5 and <15 with documented symptoms (excessive daytime sleepiness, impaired cognition, mood disorders, insomnia, or documented hypertension, ischemic heart disease, or history of stroke). 2) Patient has tried and failed CPAP therapy OR CPAP is contraindicated. Failure documented as: inability to use CPAP due to intolerance, inadequate response despite optimal titration, or documented medical contraindication. 3) Custom-fabricated oral appliance prescribed by treating physician and fabricated by qualified dental professional. 4) FDA-approved device for OSA treatment. 5) Follow-up sleep study required after oral appliance to document therapeutic response. 6) Ongoing monitoring required. Coverage Limitations: Non-custom appliances not covered, over-the-counter devices excluded, devices for snoring without OSA diagnosis not covered. Source: https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?LCDId=33611',
-          source: 'CMS LCD L33611',
+          content: 'CMS LCD L33611 - Oral Appliances for Obstructive Sleep Apnea (OSA). OFFICIAL MEDICARE COVERAGE POLICY. Effective Date: 08/08/2021. Coverage Requirements: 1) Diagnosis of OSA must be established by polysomnography (sleep study) showing Apnea-Hypopnea Index (AHI) or Respiratory Disturbance Index (RDI) ≥15 events/hour, OR AHI/RDI ≥5 and <15 with documented symptoms (excessive daytime sleepiness, impaired cognition, mood disorders, insomnia, or documented hypertension, ischemic heart disease, or history of stroke). 2) Patient has tried and failed CPAP therapy OR CPAP is contraindicated. Failure documented as: inability to use CPAP due to intolerance, inadequate response despite optimal titration, or documented medical contraindication. 3) Custom-fabricated oral appliance prescribed by treating physician (MD/DO) and fabricated by qualified dental professional. 4) FDA-approved device specifically for OSA treatment. 5) Follow-up sleep study required after oral appliance to document therapeutic response. 6) Ongoing monitoring required at least annually. Coverage Limitations: Non-custom prefabricated appliances not covered, over-the-counter devices excluded, devices for snoring without documented OSA diagnosis not covered, replacement only covered every 5 years or with significant weight change. Medicare contractors: CGS Administrators LLC, Noridian Healthcare Solutions LLC. LCD ID: L33611. Source: https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?LCDId=33611',
+          source: 'CMS LCD L33611 - Official Medicare Policy',
           caseId,
           documentType: 'Clinical Guidelines',
-          metadata: { category: 'Medicare Coverage Policy', priority: 'high' }
+          metadata: { category: 'Medicare Coverage Policy', priority: 'critical', source_url: 'https://www.cms.gov/medicare-coverage-database/view/lcd.aspx?LCDId=33611' }
         },
         {
           id: 'cms-lcd-full-2',
@@ -424,28 +431,28 @@ class KnowledgeBaseService {
     } else if (caseId === 'PA-2024-007') {
       return [
         {
-          id: 'aafp-diverticulitis-1',
-          content: 'AAFP Diverticulitis Management Guidelines: Acute diverticulitis classified by Hinchey staging: Stage 0 (mild clinical diverticulitis) - confined inflammation, no complications. Stage Ia (phlegmon) - confined pericolic inflammation/phlegmon. Stage Ib (pericolic/mesenteric abscess) - confined pericolic or mesenteric abscess. Stage II (pelvic abscess) - distant abscess (retroperitoneal or pelvic). Stage III (purulent peritonitis) - generalized purulent peritonitis. Stage IV (fecal peritonitis) - generalized fecal peritonitis. Treatment approach based on severity: Uncomplicated (Hinchey 0-Ia): Outpatient management appropriate for most patients, clear liquid diet initially, advance to low-residue diet as tolerated, oral antibiotics traditionally used but recent studies show selective antibiotic use safe in immunocompetent patients. Success rate 90-95% for outpatient management. Complicated (Hinchey Ib-IV): Hospitalization required, IV antibiotics, bowel rest (NPO), IV fluids, imaging (CT with contrast preferred). Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/',
-          source: 'AAFP Diverticulitis Guidelines',
+          id: 'pmc-diverticulitis-1',
+          content: 'Acute Diverticulitis Management Guidelines - Published PMC7904336. EVIDENCE-BASED CLINICAL PRACTICE GUIDELINES. Acute diverticulitis classified by Hinchey staging system: Stage 0 (mild clinical diverticulitis) - confined inflammation, no complications, normal CT or mild wall thickening. Stage Ia (phlegmon) - confined pericolic inflammation/phlegmon without abscess formation. Stage Ib (pericolic/mesenteric abscess) - confined pericolic or mesenteric abscess, localized collection <4cm. Stage II (pelvic abscess) - distant abscess in pelvis or retroperitoneum, collection >4cm requiring drainage. Stage III (purulent peritonitis) - generalized purulent peritonitis from microperforation, free fluid. Stage IV (fecal peritonitis) - generalized fecal peritonitis from macroperforation, free air and fecal contamination. Treatment approach based on severity classification: Uncomplicated diverticulitis (Hinchey 0-Ia): Outpatient management appropriate for most immunocompetent patients, clear liquid diet initially progressing to low-residue diet as tolerated, oral antibiotics (ciprofloxacin 500mg BID + metronidazole 500mg TID OR amoxicillin-clavulanate 875mg BID) for 7-10 days traditionally used but recent evidence shows selective non-antibiotic approach safe in select patients, close follow-up required within 2-3 days, success rate 90-95% for outpatient management. Complicated diverticulitis (Hinchey Ib-IV): Immediate hospitalization required, IV broad-spectrum antibiotics, strict bowel rest (NPO), IV fluid resuscitation, CT scan with IV contrast preferred imaging modality, surgical consultation, interventional radiology for abscess drainage if indicated. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/',
+          source: 'PMC Clinical Practice Guidelines - Diverticulitis',
           caseId,
           documentType: 'Clinical Guidelines',
-          metadata: { category: 'Clinical Practice Guidelines', priority: 'high' }
+          metadata: { category: 'Clinical Practice Guidelines', priority: 'critical', source_url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/' }
         },
         {
-          id: 'aafp-diverticulitis-2',
-          content: 'AAFP Diverticulitis Guidelines Continued: Admission Criteria (when hospitalization required): Inability to tolerate oral intake (nausea, vomiting), severe symptoms (high fever >102°F, severe abdominal pain), immunocompromised state (steroids, chemotherapy, transplant), significant comorbidities (advanced age >70, chronic kidney disease, unstable medical conditions), complicated diverticulitis on imaging (abscess, perforation, obstruction), failure of outpatient treatment (symptoms worsen or no improvement in 2-3 days), concern for alternative diagnosis requiring workup, inadequate social support for outpatient management. Inpatient Treatment Protocol: NPO (nothing by mouth) initially, IV hydration and electrolyte management, IV broad-spectrum antibiotics covering gram-negative and anaerobic organisms (typical regimen: ciprofloxacin + metronidazole, or ceftriaxone + metronidazole, or piperacillin-tazobactam), pain management (avoiding NSAIDs which may increase perforation risk), serial abdominal exams to monitor for peritonitis, repeat imaging if clinical deterioration. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/',
-          source: 'AAFP Diverticulitis Guidelines',
+          id: 'pmc-diverticulitis-2',
+          content: 'Diverticulitis Hospitalization Criteria and Inpatient Management - PMC7904336. ADMISSION CRITERIA (when hospitalization required): Clinical indicators: Inability to tolerate oral intake due to persistent nausea and vomiting, severe clinical symptoms (temperature >102°F/38.9°C, severe abdominal pain requiring parenteral analgesia, signs of peritoneal irritation), immunocompromised state (chronic corticosteroid use, active chemotherapy, solid organ transplant recipients, HIV/AIDS), significant comorbidities affecting management (advanced age >70 years, chronic kidney disease stage 3 or higher, heart failure, COPD, diabetes mellitus), complicated diverticulitis on CT imaging (abscess formation, perforation, fistula, obstruction), failure of outpatient treatment (symptoms worsen or no clinical improvement within 48-72 hours), concern for alternative diagnosis requiring hospital workup (inflammatory bowel disease, malignancy, ischemic colitis), inadequate social support or home care for safe outpatient management, pregnancy. INPATIENT TREATMENT PROTOCOL: Strict bowel rest (NPO - nothing by mouth) initially until clinical improvement, IV fluid resuscitation with normal saline or lactated Ringers to maintain euvolemia, electrolyte monitoring and replacement as needed, IV broad-spectrum antibiotics covering gram-negative and anaerobic organisms initiated promptly (typical antibiotic regimens: ciprofloxacin 400mg IV Q12h + metronidazole 500mg IV Q8h, OR ceftriaxone 1-2g IV daily + metronidazole 500mg IV Q8h, OR piperacillin-tazobactam 3.375g IV Q6h, OR ertapenem 1g IV daily), pain management with IV opioids or IV acetaminophen (avoid NSAIDs which increase perforation risk), antiemetics for nausea control, serial physical examinations every 4-8 hours monitoring for peritoneal signs, complete blood count and inflammatory markers (WBC, CRP) monitoring, repeat CT imaging if clinical deterioration or failure to improve within 48-72 hours. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/',
+          source: 'PMC Clinical Guidelines - Diverticulitis Inpatient Care',
           caseId,
           documentType: 'Clinical Guidelines',
-          metadata: { category: 'Clinical Practice Guidelines', priority: 'high' }
+          metadata: { category: 'Clinical Practice Guidelines', priority: 'critical', source_url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/' }
         },
         {
-          id: 'aafp-diverticulitis-3',
-          content: 'AAFP Diverticulitis Guidelines - Interventional Management: Abscess Management: <3-4 cm abscess - typically managed with antibiotics alone, >4 cm abscess - percutaneous drainage recommended, improves outcomes and may avoid emergency surgery. Surgical Intervention Indications: Emergency surgery required for: diffuse peritonitis (Hinchey III-IV), perforation with hemodynamic instability, clinical deterioration despite medical management, uncontrolled sepsis. Elective surgery considerations: recurrent episodes (individualized decision, not automatic after 2 episodes), persistent symptoms, immunocompromised patients, complicated diverticulitis with stricture/fistula, inability to exclude malignancy. Surgical options: Primary resection with anastomosis (preferred when feasible), Hartmann procedure (resection with colostomy, for high-risk patients). Disposition and Follow-up: Discharge criteria: tolerating regular diet, pain controlled on oral medications, afebrile >24 hours, normal/near-normal WBC. Outpatient follow-up: colonoscopy 6-8 weeks after acute episode to rule out colorectal cancer or IBD. Patient education: high-fiber diet after recovery, adequate hydration, signs of recurrence. Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/',
-          source: 'AAFP Diverticulitis Guidelines',
+          id: 'pmc-diverticulitis-3',
+          content: 'Diverticulitis Interventional and Surgical Management - PMC7904336. ABSCESS MANAGEMENT: Small abscess (<3-4 cm diameter): Typically managed with IV antibiotics alone without drainage, close monitoring with serial exams and imaging, 80-85% success rate with medical management alone. Large abscess (>4 cm diameter): Percutaneous CT-guided or ultrasound-guided drainage strongly recommended, significantly improves clinical outcomes, allows resolution of acute infection, may avoid emergency surgery and permit elective single-stage resection later, drain left in place until output <10-20 mL/day and patient clinically improved. SURGICAL INTERVENTION INDICATIONS: Emergency/Urgent Surgery Required For: Diffuse peritonitis with free perforation (Hinchey stage III-IV), hemodynamic instability or septic shock despite resuscitation, clinical deterioration despite optimal medical management and drainage, uncontrolled sepsis with multi-organ dysfunction, complete bowel obstruction, inability to exclude perforated malignancy. Elective Surgery Considerations: Recurrent diverticulitis episodes (decision individualized based on frequency, severity, and patient factors - no longer automatic after 2 episodes), persistent symptoms after acute episode resolution, immunocompromised patients (higher risk complications, lower threshold for surgery), complicated diverticulitis with stricture causing obstruction or fistula formation (colovesical, colovaginal, coloenteric), inability to exclude colorectal malignancy on colonoscopy. SURGICAL OPTIONS: Primary resection with primary anastomosis (preferred approach when feasible, single-stage procedure, immediate restoration of bowel continuity, appropriate for hemodynamically stable patients without diffuse contamination), Hartmann procedure (sigmoid resection with end colostomy creation and rectal stump closure, for high-risk patients, severe peritonitis, hemodynamic instability, requires second operation for reversal 3-6 months later), Laparoscopic approach preferred over open when technically feasible (faster recovery, less pain, shorter hospital stay, similar outcomes). DISPOSITION AND FOLLOW-UP: Hospital Discharge Criteria: Tolerating regular or low-residue diet without nausea, pain adequately controlled with oral analgesics, afebrile for >24 hours off antibiotics, white blood cell count normal or near-normal (<12,000), normal or improving inflammatory markers, stable hemodynamics. Outpatient Follow-up Requirements: Colonoscopy mandatory 6-8 weeks after acute episode resolution to rule out colorectal cancer or inflammatory bowel disease (IBD), repeat imaging (CT) if needed to confirm resolution, surgical consultation if recurrent episodes or persistent symptoms. Long-term Prevention: High-fiber diet (25-35g daily) after complete recovery, adequate hydration (8-10 glasses water daily), regular physical activity, avoid nuts/seeds restriction (outdated recommendation, no evidence of harm), patient education on warning signs of recurrence (LLQ pain, fever, change in bowel habits). Source: https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/',
+          source: 'PMC Clinical Guidelines - Diverticulitis Surgical Management',
           caseId,
           documentType: 'Clinical Guidelines',
-          metadata: { category: 'Clinical Practice Guidelines', priority: 'high' }
+          metadata: { category: 'Clinical Practice Guidelines', priority: 'critical', source_url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC7904336/' }
         }
       ];
     }
